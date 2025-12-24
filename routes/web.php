@@ -1,29 +1,40 @@
 <?php
 
+use App\Models\Client;
+use App\Models\Project;
+use App\Models\Task;
+use App\Models\Invoice;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return response()->json([
-        'message' => 'Welcome to Clary - Multi-Tenant Agency Client Management Platform',
-        'version' => '1.0.0',
-        'api_status' => 'active',
-        'documentation' => 'See README.md and GETTING_STARTED.md for complete documentation',
-        'api_endpoints' => [
-            'clients' => url('/api/clients'),
-            'projects' => url('/api/projects'),
-            'tasks' => url('/api/tasks'),
-            'invoices' => url('/api/invoices'),
-        ],
-        'getting_started' => [
-            'quick_start' => 'Access the API at /api/* endpoints',
-            'list_clients' => 'GET /api/clients',
-            'create_client' => 'POST /api/clients',
-            'documentation_file' => 'GETTING_STARTED.md',
-        ],
-        'multi_tenancy' => [
-            'status' => 'enabled',
-            'note' => 'This is a multi-tenant platform. API endpoints work on central domain. For tenant-specific access, configure a tenant domain.',
-        ],
-        'health_check' => url('/up'),
-    ], 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+    return view('welcome');
 });
+
+Route::get('/dashboard', function () {
+    $clients = Client::with(['projects', 'invoices'])->get();
+    $projects = Project::with('client')->get();
+    $tasks = Task::with(['project', 'assignedUser'])->get();
+    $invoices = Invoice::with('client')->get();
+    
+    return view('dashboard', compact('clients', 'projects', 'tasks', 'invoices'));
+})->name('dashboard');
+
+Route::get('/clients', function () {
+    $clients = Client::with(['projects', 'invoices'])->get();
+    return view('clients.index', compact('clients'));
+})->name('clients.index');
+
+Route::get('/projects', function () {
+    $projects = Project::with(['client', 'tasks'])->get();
+    return view('projects.index', compact('projects'));
+})->name('projects.index');
+
+Route::get('/tasks', function () {
+    $tasks = Task::with(['project', 'assignedUser'])->get();
+    return view('tasks.index', compact('tasks'));
+})->name('tasks.index');
+
+Route::get('/invoices', function () {
+    $invoices = Invoice::with(['client', 'project'])->get();
+    return view('invoices.index', compact('invoices'));
+})->name('invoices.index');
