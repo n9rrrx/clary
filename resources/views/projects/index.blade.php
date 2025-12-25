@@ -1,67 +1,57 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects - Clary</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-2xl font-bold text-gray-800">Clary</h1>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{{ route('dashboard') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Dashboard</a>
-                        <a href="{{ route('clients.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Clients</a>
-                        <a href="{{ route('projects.index') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Projects</a>
-                        <a href="{{ route('tasks.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Tasks</a>
-                        <a href="{{ route('invoices.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">Invoices</a>
-                    </div>
-                </div>
+<x-app-layout>
+    <div class="flex flex-col h-full w-full bg-white dark:bg-midnight-900 transition-colors duration-300">
+
+        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-line shrink-0 bg-white dark:bg-midnight-900 transition-colors duration-300">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Projects</h1>
+                <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-midnight-800 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-line">
+                    {{ $projects->count() ?? 0 }} Active
+                </span>
             </div>
+            <a href="{{ route('projects.create') }}" class="flex items-center px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded text-sm font-medium transition-colors">
+                + New Project
+            </a>
         </div>
-    </nav>
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <h2 class="text-3xl font-bold text-gray-900 mb-6">Projects</h2>
-            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Budget</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tasks</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse($projects as $project)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4"><div class="text-sm font-medium text-gray-900">{{ $project->name }}</div></td>
-                            <td class="px-6 py-4"><div class="text-sm text-gray-500">{{ $project->client->name }}</div></td>
-                            <td class="px-6 py-4"><div class="text-sm text-gray-500">${{ number_format($project->budget, 2) }}</div></td>
-                            <td class="px-6 py-4 text-sm text-gray-500">{{ $project->tasks->count() }}</td>
-                            <td class="px-6 py-4">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                                    @if($project->status === 'completed') bg-green-100 text-green-800
-                                    @elseif($project->status === 'in_progress') bg-blue-100 text-blue-800
-                                    @else bg-gray-100 text-gray-800 @endif">
-                                    {{ str_replace('_', ' ', ucfirst($project->status)) }}
+
+        <div class="flex-1 overflow-auto bg-white dark:bg-midnight-900">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 dark:bg-midnight-800 sticky top-0 z-10">
+                <tr>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line">Project Name</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line">Client</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line">Status</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line text-right">Deadline</th>
+                    <th class="px-6 py-3 border-b border-gray-200 dark:border-line"></th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 dark:divide-line">
+                @forelse ($projects as $project)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-midnight-800/50 transition-colors group">
+                        <td class="px-6 py-4 font-medium text-gray-900 dark:text-white">{{ $project->name }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            {{ $project->client->name ?? 'Internal' }}
+                        </td>
+                        <td class="px-6 py-4">
+                                <span class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 border border-transparent dark:border-blue-800">
+                                    {{ ucfirst($project->status) }}
                                 </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr><td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">No projects found.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                        </td>
+                        <td class="px-6 py-4 text-right text-sm text-gray-500 dark:text-gray-400">
+                            {{ $project->deadline ? \Carbon\Carbon::parse($project->deadline)->format('M d') : '—' }}
+                        </td>
+                        <td class="px-6 py-4 text-right">
+                            <a href="#" class="text-gray-400 hover:text-white opacity-0 group-hover:opacity-100 transition-opacity">Edit</a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="5" class="px-6 py-24 text-center text-gray-500 dark:text-gray-400">
+                            No projects yet. Start building!
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-</body>
-</html>
+</x-app-layout>

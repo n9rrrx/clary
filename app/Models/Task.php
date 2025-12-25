@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Task extends Model
 {
     protected $fillable = [
+        'user_id',
         'project_id',
         'assigned_to',
         'title',

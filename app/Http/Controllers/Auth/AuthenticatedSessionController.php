@@ -28,7 +28,21 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // 1. Get the role from the User
+        $role = $request->user()->role;
+
+        // 2. Redirect based on role
+        if ($role === 'super_admin') {
+            return redirect()->intended(route('super_admin.dashboard'));
+        }
+        elseif ($role === 'admin') {
+            // The Agency Dashboard we built (Midnight Theme)
+            return redirect()->intended(route('dashboard'));
+        }
+
+        // 3. Default: Regular Client Portal (We need to build this next)
+        // For now, you can send them to 'dashboard' too, or a specific client page
+        return redirect()->intended(route('dashboard'));
     }
 
     /**

@@ -1,109 +1,106 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clients - Clary</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <h1 class="text-2xl font-bold text-gray-800">Clary</h1>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <a href="{{ route('dashboard') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Dashboard
-                        </a>
-                        <a href="{{ route('clients.index') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Clients
-                        </a>
-                        <a href="{{ route('projects.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Projects
-                        </a>
-                        <a href="{{ route('tasks.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Tasks
-                        </a>
-                        <a href="{{ route('invoices.index') }}" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Invoices
-                        </a>
-                    </div>
+<x-app-layout>
+    <div class="flex flex-col h-full w-full bg-white dark:bg-midnight-900 transition-colors duration-300">
+
+        <div class="h-16 flex items-center justify-between px-6 border-b border-gray-200 dark:border-line shrink-0 bg-white dark:bg-midnight-900 transition-colors duration-300">
+            <div class="flex items-center space-x-4">
+                <h1 class="text-lg font-semibold text-gray-900 dark:text-white">Clients</h1>
+                <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-midnight-800 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-line">
+                    {{ $clients->count() ?? 0 }} Total
+                </span>
+            </div>
+
+            <div class="flex items-center space-x-3">
+                <div class="flex bg-gray-100 dark:bg-midnight-800 rounded p-1 border border-gray-200 dark:border-line">
+                    <button class="p-1 rounded bg-white dark:bg-midnight-700 shadow-sm text-gray-800 dark:text-white">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                    <button class="p-1 rounded text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white transition-colors">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>
+                    </button>
                 </div>
+
+                <a href="{{ route('clients.create') }}" class="flex items-center px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded text-sm font-medium transition-colors">
+                    <svg class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
+                    New Client
+                </a>
             </div>
         </div>
-    </nav>
 
-    <div class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div class="px-4 py-6 sm:px-0">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-3xl font-bold text-gray-900">Clients</h2>
-            </div>
+        <div class="flex-1 overflow-auto bg-white dark:bg-midnight-900">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 dark:bg-midnight-800 sticky top-0 z-10">
+                <tr>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line text-left">Name</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line text-left">Status</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line text-left">Type</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line text-left">Tags</th>
+                    <th class="px-6 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider border-b border-gray-200 dark:border-line text-right">Last Updated</th>
+                    <th class="px-6 py-3 border-b border-gray-200 dark:border-line"></th> </tr>
+                </thead>
 
-            <div class="bg-white shadow overflow-hidden sm:rounded-lg">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Company</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phone</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Projects</th>
-                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse($clients as $client)
-                        <tr class="hover:bg-gray-50">
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">{{ $client->name }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500">{{ $client->company ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500">{{ $client->email ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-500">{{ $client->phone ?? '-' }}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {{ $client->projects->count() }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ $client->status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                <tbody class="divide-y divide-gray-100 dark:divide-line">
+                @forelse ($clients ?? [] as $client)
+                    <tr class="hover:bg-gray-50 dark:hover:bg-midnight-800/50 transition-colors group cursor-pointer">
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="h-8 w-8 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-600 flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300 mr-3">
+                                    {{ substr($client->name, 0, 2) }}
+                                </div>
+                                <div class="text-sm font-medium text-gray-900 dark:text-white">
+                                    {{ $client->name }}
+                                    <div class="text-xs text-gray-500 dark:text-gray-500 font-normal">{{ $client->email }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 py-1 text-xs rounded-full font-medium inline-flex items-center
+                                    {{ $client->status === 'active'
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-transparent dark:border-green-800'
+                                        : 'bg-gray-100 text-gray-600 dark:bg-gray-700/30 dark:text-gray-400 border border-transparent dark:border-gray-600'
+                                    }}">
+                                    <span class="w-1.5 h-1.5 rounded-full mr-1.5 {{ $client->status === 'active' ? 'bg-green-500' : 'bg-gray-500' }}"></span>
                                     {{ ucfirst($client->status) }}
                                 </span>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                            <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                                No clients found. Create one via the API.
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-6 bg-blue-50 border-l-4 border-blue-400 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-blue-700">
-                            <strong>API Available:</strong> Use the REST API to create, update, and delete clients at <code class="bg-blue-100 px-2 py-1 rounded">POST /api/clients</code>
-                        </p>
-                    </div>
-                </div>
-            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-300">
+                            {{ ucfirst($client->type) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex gap-1">
+                                @foreach(json_decode($client->tags ?? '[]') as $tag)
+                                    <span class="px-2 py-0.5 text-[10px] rounded border border-gray-200 dark:border-line text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-midnight-800">
+                                            {{ $tag }}
+                                        </span>
+                                @endforeach
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-500 text-right">
+                            {{ $client->updated_at->diffForHumans() }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="{{ route('clients.edit', $client->id) }}" class="text-gray-400 hover:text-accent-600 dark:hover:text-white transition-colors opacity-0 group-hover:opacity-100">
+                                Edit
+                            </a>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="px-6 py-24 text-center">
+                            <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
+                                <svg class="w-12 h-12 mb-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                </svg>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">No clients found</h3>
+                                <p class="text-sm mt-1 mb-6 max-w-sm mx-auto">Get started by creating a new client to manage their projects and tasks.</p>
+                                <a href="{{ route('clients.create') }}" class="px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded-md text-sm font-medium transition-colors">
+                                    Create your first client
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
         </div>
     </div>
-</body>
-</html>
+</x-app-layout>

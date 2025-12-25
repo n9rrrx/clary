@@ -13,13 +13,12 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained(); // Tenancy (Agency Owner)
             $table->string('name');
-            $table->string('email')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('company')->nullable();
-            $table->text('address')->nullable();
-            $table->text('notes')->nullable();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->string('email');
+            $table->string('status')->default('active'); // active, inactive
+            $table->string('type')->default('customer'); // customer, lead
+            $table->json('tags')->nullable(); // Store tags like ["Developer", "Partner"]
             $table->timestamps();
         });
     }

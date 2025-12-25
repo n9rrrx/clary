@@ -21,6 +21,13 @@ class ProfileController extends Controller
         ]);
     }
 
+
+    public function show(Request $request)
+    {
+        // return a profile view; create this view if it doesn't exist
+        return view('users.profile.profile');
+    }
+
     /**
      * Update the user's profile information.
      */

@@ -11,6 +11,7 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'name',
         'email',
         'phone',
@@ -28,5 +29,15 @@ class Client extends Model
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
+    }
+
+    public function activities()
+    {
+        return $this->hasMany(Activity::class)->latest();
+    }
+
+    public function latestActivity()
+    {
+        return $this->hasOne(Activity::class)->latestOfMany();
     }
 }
