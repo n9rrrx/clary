@@ -1,4 +1,48 @@
-<!DOCTYPE html>
+@php
+    use App\Models\Client;
+    use Illuminate\Support\Facades\Auth;
+
+    $tagCounts = [];
+
+    if (Auth::check()) {
+        // LOGIC FIX:
+        // If Super Admin -> Fetch ALL clients in the database.
+        // If Agency Admin -> Fetch ONLY clients belonging to them.
+        if (Auth::user()->role === 'super_admin') {
+            $clients = Client::all();
+        } else {
+            $clients = Client::where('user_id', Auth::id())->get();
+        }
+
+        $allTags = [];
+        foreach ($clients as $client) {
+            // Decode tags (handle both JSON string and array cases)
+            $tags = is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []);
+
+            if (is_array($tags)) {
+                foreach ($tags as $tag) {
+                    $allTags[] = trim($tag);
+                }
+            }
+        }
+
+        // Count and sort tags
+        $tagCounts = array_count_values($allTags);
+        arsort($tagCounts);
+        $tagCounts = array_slice($tagCounts, 0, 5);
+    }
+
+    // Visual colors
+    $colors = [
+        ['bg' => 'bg-purple-500', 'shadow' => 'rgba(168,85,247,0.4)'],
+        ['bg' => 'bg-green-500',  'shadow' => 'rgba(34,197,94,0.4)'],
+        ['bg' => 'bg-blue-500',   'shadow' => 'rgba(59,130,246,0.4)'],
+        ['bg' => 'bg-orange-500', 'shadow' => 'rgba(249,115,22,0.4)'],
+        ['bg' => 'bg-pink-500',   'shadow' => 'rgba(236,72,153,0.4)'],
+    ];
+@endphp
+
+    <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
@@ -23,7 +67,6 @@
     </div>
 
     <nav class="flex-1 overflow-y-auto py-6 px-3 flex flex-col">
-
         <div class="space-y-1">
             <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('dashboard') ? 'bg-midnight-800 text-white' : 'text-gray-400 hover:bg-midnight-800 hover:text-white' }}">
                 <svg class="mr-3 h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -64,34 +107,25 @@
         <div class="mt-8 px-3">
             <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-3">Tags</h3>
             <div class="space-y-1">
-                <a href="#" class="flex items-center justify-between px-3 py-1.5 rounded-md hover:bg-midnight-800 group transition-colors">
-                    <div class="flex items-center">
-                        <span class="w-2 h-2 rounded-full bg-purple-500 mr-3 shadow-[0_0_8px_rgba(168,85,247,0.4)]"></span>
-                        <span class="text-sm text-gray-400 group-hover:text-white">Developer</span>
+                @if(count($tagCounts) > 0)
+                    @foreach($tagCounts as $tagName => $count)
+                        @php
+                            // Cycle through colors
+                            $style = $colors[$loop->index % count($colors)];
+                        @endphp
+                        <a href="#" class="flex items-center justify-between px-3 py-1.5 rounded-md hover:bg-midnight-800 group transition-colors">
+                            <div class="flex items-center">
+                                <span class="w-2 h-2 rounded-full {{ $style['bg'] }} mr-3" style="box-shadow: 0 0 8px {{ $style['shadow'] }}"></span>
+                                <span class="text-sm text-gray-400 group-hover:text-white truncate max-w-[120px]">{{ $tagName }}</span>
+                            </div>
+                            <span class="text-xs text-gray-600">{{ $count }}</span>
+                        </a>
+                    @endforeach
+                @else
+                    <div class="px-3 text-xs text-gray-600 italic">
+                        No tags found.<br>Create clients to see tags here.
                     </div>
-                    <span class="text-xs text-gray-600">210</span>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-1.5 rounded-md hover:bg-midnight-800 group transition-colors">
-                    <div class="flex items-center">
-                        <span class="w-2 h-2 rounded-full bg-green-500 mr-3 shadow-[0_0_8px_rgba(34,197,94,0.4)]"></span>
-                        <span class="text-sm text-gray-400 group-hover:text-white">Designer</span>
-                    </div>
-                    <span class="text-xs text-gray-600">83</span>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-1.5 rounded-md hover:bg-midnight-800 group transition-colors">
-                    <div class="flex items-center">
-                        <span class="w-2 h-2 rounded-full bg-blue-500 mr-3 shadow-[0_0_8px_rgba(59,130,246,0.4)]"></span>
-                        <span class="text-sm text-gray-400 group-hover:text-white">Partner</span>
-                    </div>
-                    <span class="text-xs text-gray-600">12</span>
-                </a>
-                <a href="#" class="flex items-center justify-between px-3 py-1.5 rounded-md hover:bg-midnight-800 group transition-colors">
-                    <div class="flex items-center">
-                        <span class="w-2 h-2 rounded-full bg-orange-500 mr-3 shadow-[0_0_8px_rgba(249,115,22,0.4)]"></span>
-                        <span class="text-sm text-gray-400 group-hover:text-white">Prospect</span>
-                    </div>
-                    <span class="text-xs text-gray-600">23</span>
-                </a>
+                @endif
             </div>
         </div>
 
@@ -110,7 +144,7 @@
     </div>
 </aside>
 
-<main class="flex-1 flex flex-col min-w-0 bg-midnight-900 overflow-hidden">
+<main class="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-midnight-900 transition-colors duration-300 overflow-hidden">
 
     <header class="h-16 border-b border-line flex items-center justify-between px-8 bg-midnight-900 flex-shrink-0">
         <div class="flex-1 max-w-lg">
@@ -132,14 +166,11 @@
                 <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-midnight-900"></span>
             </button>
 
-            <!-- Theme toggle -->
             <button id="themeToggle" class="flex items-center px-2 py-1 bg-midnight-800 rounded text-gray-300 hover:text-white transition-colors" title="Toggle theme">
                 <svg id="themeIcon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <!-- Icon switched by JS -->
                 </svg>
             </button>
 
-            <!-- User menu -->
             <div class="relative">
                 <button id="userMenuBtn" class="flex items-center text-sm focus:outline-none">
                     <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-accent-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm">
