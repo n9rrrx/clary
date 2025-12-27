@@ -36,7 +36,23 @@
                 </thead>
 
                 <tbody class="divide-y divide-gray-100 dark:divide-line">
+                @php $lastOwnerId = null; @endphp
+
                 @forelse ($clients ?? [] as $client)
+
+                    {{-- SUPER ADMIN GROUPING HEADER --}}
+                    {{-- If we are Super Admin AND the owner has changed, show a divider --}}
+                    @if(Auth::user()->role === 'super_admin' && $client->user_id !== $lastOwnerId)
+                        <tr class="bg-gray-50 dark:bg-midnight-800 border-b border-gray-200 dark:border-line">
+                            <td colspan="7" class="px-6 py-2 text-xs font-bold uppercase tracking-wider text-accent-600 dark:text-accent-400">
+                                Agency: {{ $client->user->name ?? 'Unknown Agency' }}
+                                <span class="text-gray-400 dark:text-gray-500 font-normal ml-1">({{ $client->user->email ?? '' }})</span>
+                            </td>
+                        </tr>
+                        @php $lastOwnerId = $client->user_id; @endphp
+                    @endif
+
+                    {{-- THE NORMAL ROW (Same as before) --}}
                     <tr onclick="window.location='{{ route('clients.edit', $client->id) }}'" class="hover:bg-gray-50 dark:hover:bg-midnight-800/50 transition-colors group cursor-pointer">
 
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -52,49 +68,38 @@
                         </td>
 
                         @if(Auth::user()->role === 'super_admin')
-                            <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="text-xs font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded">
-                                {{ $client->user->name ?? 'Unknown' }}
-                            </span>
+                            <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-400">
+                                {{ $client->user->name ?? '-' }}
                             </td>
                         @endif
 
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-xs rounded-full font-medium inline-flex items-center
-                                {{ $client->status === 'active'
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-transparent dark:border-green-800'
-                                    : 'bg-gray-100 text-gray-600 dark:bg-gray-700/30 dark:text-gray-400 border border-transparent dark:border-gray-600'
-                                }}">
-                                <span class="w-1.5 h-1.5 rounded-full mr-1.5 {{ $client->status === 'active' ? 'bg-green-500' : 'bg-gray-500' }}"></span>
-                                {{ ucfirst($client->status) }}
-                            </span>
+                <span class="px-2 py-1 text-xs rounded-full font-medium inline-flex items-center
+                    {{ $client->status === 'active'
+                        ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 border border-transparent dark:border-green-800'
+                        : 'bg-gray-100 text-gray-600 dark:bg-gray-700/30 dark:text-gray-400 border border-transparent dark:border-gray-600'
+                    }}">
+                    {{ ucfirst($client->status) }}
+                </span>
                         </td>
 
                         <td class="px-6 py-4 whitespace-nowrap">
-                            <span class="px-2 py-1 text-[10px] uppercase tracking-wide rounded font-semibold
-                                {{ $client->type === 'customer' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : '' }}
-                                {{ $client->type === 'partner' ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400' : '' }}
-                                {{ $client->type === 'lead' ? 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400' : '' }}
-                                {{ $client->type === 'prospect' ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400' : '' }}">
-                                {{ ucfirst($client->type) }}
-                            </span>
+                 <span class="px-2 py-1 text-[10px] uppercase tracking-wide rounded font-semibold
+                    {{ $client->type === 'customer' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' : '' }}
+                    {{ $client->type === 'partner' ? 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400' : '' }}
+                    {{ $client->type === 'lead' ? 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400' : '' }}
+                    {{ $client->type === 'prospect' ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400' : '' }}">
+                    {{ ucfirst($client->type) }}
+                </span>
                         </td>
 
                         <td class="px-6 py-4 whitespace-nowrap">
                             <div class="flex gap-1">
-                                @php
-                                    $tags = is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []);
-                                @endphp
-
-                                @if(is_array($tags) && count($tags) > 0)
-                                    @foreach($tags as $tag)
-                                        <span class="px-2 py-0.5 text-[10px] rounded border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-midnight-800">
-                                            {{ $tag }}
-                                        </span>
-                                    @endforeach
-                                @else
-                                    <span class="text-xs text-gray-400 italic">-</span>
-                                @endif
+                                @foreach(is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []) as $tag)
+                                    <span class="px-2 py-0.5 text-[10px] rounded border border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-midnight-800 {{ request('tag') == $tag ? 'ring-1 ring-accent-500' : '' }}">
+                            {{ $tag }}
+                        </span>
+                                @endforeach
                             </div>
                         </td>
 
@@ -107,20 +112,12 @@
                                 Edit
                             </a>
                         </td>
+
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="{{ Auth::user()->role === 'super_admin' ? 7 : 6 }}" class="px-6 py-24 text-center">
-                            <div class="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400">
-                                <svg class="w-12 h-12 mb-4 text-gray-300 dark:text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                                <h3 class="text-lg font-medium text-gray-900 dark:text-white">No clients found</h3>
-                                <p class="text-sm mt-1 mb-6 max-w-sm mx-auto">Get started by creating a new client to manage their projects and tasks.</p>
-                                <a href="{{ route('clients.create') }}" class="px-4 py-2 bg-accent-600 hover:bg-accent-500 text-white rounded-md text-sm font-medium transition-colors shadow-lg shadow-accent-500/30">
-                                    Create your first client
-                                </a>
-                            </div>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-500">
+                            No clients found matching that filter.
                         </td>
                     </tr>
                 @endforelse

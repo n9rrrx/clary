@@ -12,21 +12,30 @@ class ClientController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        // LOGIC UPDATE:
-        // If Super Admin, show ALL clients.
-        // If Agency Admin, show ONLY their clients.
+        // Start the query
+        $query = Client::query();
 
-        if (Auth::user()->role === 'super_admin') {
-            $clients = Client::with('user') // Eager load user to display name efficiently
-            ->orderByDesc('updated_at')
-                ->get();
-        } else {
-            $clients = Client::where('user_id', Auth::id())
-                ->orderByDesc('updated_at')
-                ->get();
+        // 1. FILTER: If a 'tag' is clicked, filter by it
+        if ($request->has('tag')) {
+            // We use whereJsonContains because tags are stored as ["Tag1", "Tag2"]
+            $query->whereJsonContains('tags', $request->tag);
         }
+
+        // 2. ROLE LOGIC:
+        if (Auth::user()->role === 'super_admin') {
+            // Super Admin: See ALL, but eager load the Owner details
+            // Order by 'user_id' so clients from the same agency stay together
+            $query->with('user')->orderBy('user_id');
+        } else {
+            // Agency Admin: See only YOURS
+            $query->where('user_id', Auth::id());
+        }
+
+        // 3. Final Sort & Fetch
+        // We add a secondary sort by date so newest are top within the agency group
+        $clients = $query->orderByDesc('updated_at')->get();
 
         return view('clients.index', compact('clients'));
     }
