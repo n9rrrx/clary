@@ -29,6 +29,12 @@ class Invoice extends Model
         'total' => 'decimal:2',
     ];
 
+    // Added User relationship so we can fetch the Agency Profile
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);
