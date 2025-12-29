@@ -73,4 +73,9 @@ class User extends Authenticatable
     {
         return $this->hasMany(Client::class);
     }
+
+    public function agencyProfile()
+    {
+        return $this->hasOne(AgencyProfile::class);
+    }
 }

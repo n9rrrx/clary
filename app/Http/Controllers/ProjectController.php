@@ -3,72 +3,90 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\Client;
+use App\Models\Activity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class ProjectController extends Controller
 {
+    // ==========================================
+    // ADMIN DASHBOARD METHODS
+    // ==========================================
+
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        // Fetch projects with their client data
-        $projects = Project::where('user_id', Auth::id())
-            ->with('client')
-            ->orderByDesc('updated_at')
-            ->get();
-
+        $projects = Project::with('client')->latest()->paginate(10);
         return view('projects.index', compact('projects'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        // We need the list of clients to populate the dropdown
-        $clients = \App\Models\Client::all();
-
+        $clients = Client::all();
         return view('projects.create', compact('clients'));
     }
+
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'client_id' => 'required|exists:clients,id',
-            'status' => 'required|string|in:planning,in_progress,completed,on_hold,cancelled',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date',
+            'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'budget' => 'nullable|numeric|min:0',
+            'status' => 'required|in:planning,in_progress,completed,on_hold,cancelled',
         ]);
 
-        $project = new Project($validated);
-        $project->user_id = Auth::id();
-        $project->save();
+        Project::create($validated);
 
         return redirect()->route('projects.index')->with('success', 'Project created successfully.');
     }
 
-    // Show the Edit Form
-    public function edit($id)
+    /**
+     * Display the specified resource (Admin View).
+     * [FIX]: This was the missing method causing your error.
+     */
+    public function show(Project $project)
     {
-        // Find project belonging to the logged-in user
-        $project = Project::where('user_id', Auth::id())->findOrFail($id);
+        // Eager load relationships for the view
+        $project->load(['client', 'tasks', 'invoices']);
 
-        // Get clients for the dropdown
-        $clients = \App\Models\Client::all();
+        // Ensure you have a view at resources/views/projects/show.blade.php
+        return view('projects.show', compact('project'));
+    }
 
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Project $project)
+    {
+        $clients = Client::all();
         return view('projects.edit', compact('project', 'clients'));
     }
 
-    // Handle the Update logic
-    public function update(Request $request, $id)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Project $project)
     {
-        $project = Project::where('user_id', Auth::id())->findOrFail($id);
-
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
             'client_id' => 'required|exists:clients,id',
-            'status' => 'required|string|in:planning,in_progress,completed,on_hold,cancelled',
+            'name' => 'required|string|max:255',
+            'description' => 'nullable|string',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
-            'description' => 'nullable|string',
-            'budget' => 'nullable|numeric|min:0|max:99999999',
+            'budget' => 'nullable|numeric|min:0',
+            'status' => 'required|in:planning,in_progress,completed,on_hold,cancelled',
         ]);
 
         $project->update($validated);
@@ -76,18 +94,63 @@ class ProjectController extends Controller
         return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
     }
 
-    public function show($id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Project $project)
     {
-        // If Super Admin, find any project. If regular user, only find their own.
-        $query = Project::with(['client', 'tasks', 'invoices']);
-
-        if (Auth::user()->role !== 'super_admin') {
-            $query->where('user_id', Auth::id());
-        }
-
-        $project = $query->findOrFail($id);
-
-        return view('projects.show', compact('project'));
+        $project->delete();
+        return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');
     }
 
+    // ==========================================
+    // CLIENT PORTAL METHODS
+    // ==========================================
+
+    public function clientShow(Project $project)
+    {
+        $user = Auth::user();
+        $clientProfile = Client::where('email', $user->email)->first();
+
+        // Security check: Ensure this client owns this project
+        if (!$clientProfile || $project->client_id !== $clientProfile->id) {
+            abort(403, 'Unauthorized access to this project.');
+        }
+
+        $project->load(['tasks']);
+
+        // Fetch activity feed (using the Client Profile ID)
+        $activities = Activity::where('client_id', $clientProfile->id)
+            ->with('user')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return view('projects.client_show', compact('project', 'activities'));
+    }
+
+    public function storeComment(Request $request, Project $project)
+    {
+        $request->validate(['body' => 'required|string']);
+
+        $user = Auth::user();
+        $clientProfile = Client::where('email', $user->email)->first();
+
+        if (!$clientProfile || $project->client_id !== $clientProfile->id) {
+            abort(403);
+        }
+
+        Activity::create([
+            'user_id' => $user->id,
+            'client_id' => $clientProfile->id,
+            'type' => 'comment',
+            'description' => "posted on project: {$project->name}",
+            'body' => $request->body,
+        ]);
+
+        if ($request->wantsJson()) {
+            return response()->json(['status' => 'success']);
+        }
+
+        return back()->with('success', 'Message posted!');
+    }
 }

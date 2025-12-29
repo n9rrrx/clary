@@ -9,6 +9,8 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AgencyProfileController;
+use App\Http\Controllers\Api\ChatController; // <--- NEW IMPORT
 
 // Public Routes
 Route::get('/', function () {
@@ -30,7 +32,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/dashboard/activity', [DashboardController::class, 'storeActivity'])->name('dashboard.activity.store');
 
     // 2. SUPER ADMIN ONLY: Agency Management (Users)
-    // We strictly use the Gate check here. No extra closure needed.
     Route::resource('users', UserController::class)->middleware('can:access-agencies');
 
     // 3. PROFILE SETTINGS
@@ -42,5 +43,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/portal', function() {
         return "Client Portal Coming Soon";
     })->name('client.portal');
+
+    Route::get('/portal/projects/{project}', [ProjectController::class, 'clientShow'])->name('client.projects.show');
+    Route::post('/portal/projects/{project}/comment', [ProjectController::class, 'storeComment'])->name('client.projects.comment');
+
+    // UPDATED: Client Chat API (Uses ChatController now)
+    Route::get('/portal/projects/{project}/messages', [ChatController::class, 'clientFetch'])->name('client.chat.fetch');
+
+    // NEW: Admin Chat API (For Dashboard Polling)
+    Route::get('/dashboard/chat/{client}/messages', [ChatController::class, 'adminFetch'])->name('admin.chat.fetch');
+
+    // 5. SETTINGS
+    Route::get('/settings', [AgencyProfileController::class, 'edit'])->name('settings.edit');
+    Route::post('/settings', [AgencyProfileController::class, 'update'])->name('settings.update');
 
 });

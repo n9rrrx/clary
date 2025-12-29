@@ -4,91 +4,94 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\Client; // Optional: if you want to filter projects by client
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
+    /**
+     * Display a listing of the resource.
+     */
     public function index()
     {
-        // Get all tasks for the logged-in user (via their projects)
-        // Note: This assumes tasks belong to projects, and projects belong to users.
-        $tasks = Task::whereHas('project', function($query) {
-            $query->where('user_id', Auth::id());
-        })->with('project')->latest()->get();
-
+        $tasks = Task::with('project.client')->latest()->paginate(15);
         return view('tasks.index', compact('tasks'));
     }
 
+    /**
+     * Show the form for creating a new resource.
+     */
     public function create()
     {
-        // Fetch User's Projects to populate dropdown
-        $projects = Project::where('user_id', Auth::id())->get();
+        // We need projects to select from when creating a task
+        $projects = Project::where('status', '!=', 'cancelled')->get();
         return view('tasks.create', compact('projects'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     */
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:255', // CHANGED: matches DB column
             'project_id' => 'required|exists:projects,id',
-            // CHANGED: matches DB Enum
-            'status' => 'required|string|in:todo,in_progress,review,completed',
-            'priority' => 'required|string|in:low,medium,high,urgent',
-            'due_date' => 'nullable|date',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'status' => 'required|in:pending,in_progress,completed',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
         ]);
 
-        $task = new Task($validated);
-        $task->user_id = Auth::id(); // REQUIRED: Your DB says user_id cannot be null
-        $task->save();
+        Task::create($validated);
 
-        return redirect()->route('projects.show', $request->project_id)
+        return redirect()->route('dashboard', ['tab' => 'tasks'])
             ->with('success', 'Task created successfully.');
     }
 
-    public function edit($id)
+    /**
+     * Display the specified resource.
+     */
+    public function show(Task $task)
     {
-        // Find task securely (ensure it belongs to a project owned by the user)
-        $task = Task::whereHas('project', function($query) {
-            $query->where('user_id', Auth::id());
-        })->findOrFail($id);
+        // This is the method hit by /tasks/1
+        $task->load('project.client');
+        return view('tasks.show', compact('task'));
+    }
 
-        // Get projects for the dropdown
-        $projects = Project::where('user_id', Auth::id())->get();
-
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Task $task)
+    {
+        $projects = Project::where('status', '!=', 'cancelled')->get();
         return view('tasks.edit', compact('task', 'projects'));
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, Task $task)
     {
-        $task = Task::whereHas('project', function($query) {
-            $query->where('user_id', Auth::id());
-        })->findOrFail($id);
-
         $validated = $request->validate([
-            'title' => 'required|string|max:255',
             'project_id' => 'required|exists:projects,id',
-            'status' => 'required|string|in:todo,in_progress,review,completed',
-            'priority' => 'required|string|in:low,medium,high,urgent',
-            'due_date' => 'nullable|date',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'status' => 'required|in:pending,in_progress,completed',
+            'priority' => 'required|in:low,medium,high',
+            'due_date' => 'nullable|date',
         ]);
 
         $task->update($validated);
 
-        // Redirect back to the project board for a smooth flow
-        return redirect()->route('projects.show', $task->project_id)
-            ->with('success', 'Task updated successfully.');
+        return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
-    public function show($id)
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(Task $task)
     {
-        // Find task securely
-        $task = Task::whereHas('project', function($query) {
-            $query->where('user_id', Auth::id());
-        })->with('project.client')->findOrFail($id);
-
-        return view('tasks.show', compact('task'));
+        $task->delete();
+        return redirect()->back()->with('success', 'Task deleted successfully.');
     }
 }

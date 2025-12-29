@@ -6,17 +6,25 @@ use Illuminate\Database\Eloquent\Model;
 
 class Activity extends Model
 {
-    protected $guarded = []; // Allows us to create data easily
+    protected $guarded = [];
 
-    // An activity belongs to a User (Author)
+    // Add this to ensure 'read_at' is treated as a Carbon date object
+    protected $casts = [
+        'read_at' => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // An activity belongs to a Client (Target)
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function readBy()
+    {
+        return $this->belongsTo(User::class, 'read_by');
     }
 }
