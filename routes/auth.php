@@ -56,4 +56,7 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+
+    // Agencies Management (Super Admin)
+    Route::resource('users', \App\Http\Controllers\UserController::class);
 });

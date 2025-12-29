@@ -5,30 +5,27 @@
     $tagCounts = [];
 
     if (Auth::check()) {
-        // LOGIC: Super Admin sees ALL, Agency Admin sees THEIR OWN
-        if (Auth::user()->role === 'super_admin') {
+        $user = Auth::user();
+        if ($user->role === 'super_admin') {
             $clients = Client::all();
         } else {
-            $clients = Client::where('user_id', Auth::id())->get();
+            $clients = Client::where('user_id', $user->id)->get();
         }
 
         $allTags = [];
         foreach ($clients as $client) {
             $tags = is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []);
-
             if (is_array($tags)) {
                 foreach ($tags as $tag) {
                     $allTags[] = trim($tag);
                 }
             }
         }
-
         $tagCounts = array_count_values($allTags);
         arsort($tagCounts);
         $tagCounts = array_slice($tagCounts, 0, 5);
     }
 
-    // Visual colors
     $colors = [
         ['bg' => 'bg-purple-500', 'shadow' => 'rgba(168,85,247,0.4)'],
         ['bg' => 'bg-green-500',  'shadow' => 'rgba(34,197,94,0.4)'],
@@ -44,64 +41,210 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-
     <title>{{ config('app.name', 'Clary') }}</title>
-
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    <style>
+        /* Smooth Sidebar Transitions */
+        #sidebar { transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+        /* Text fading */
+        .sidebar-text {
+            transition: opacity 0.2s ease-in-out;
+            opacity: 1;
+            white-space: nowrap;
+        }
+
+        /* ---------------------------------------------------------
+           COLLAPSED STATE OVERRIDES
+           --------------------------------------------------------- */
+
+        /* Hide text completely */
+        #sidebar.collapsed .sidebar-text {
+            opacity: 0;
+            display: none;
+        }
+
+        /* HEADER ALIGNMENT */
+        #sidebar.collapsed .sidebar-header {
+            padding-left: 0;
+            padding-right: 0;
+            justify-content: center;
+        }
+
+        /* When collapsed, hide the separate toggle button (hamburger)
+           and rely on the logo to toggle expansion */
+        #sidebar.collapsed #sidebarToggleBtn {
+            display: none;
+        }
+
+        /* Center the Logo when collapsed */
+        #sidebar.collapsed #logo-link {
+            justify-content: center;
+            width: 100%;
+        }
+
+        /* NAV ITEMS ALIGNMENT */
+        #sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* FOOTER (PROFILE) ALIGNMENT */
+        #sidebar.collapsed .sidebar-footer {
+            padding: 10px 0;
+            justify-content: center;
+        }
+
+        /* LOGO SWAP ANIMATION */
+        #logo-c { display: flex; }
+        #logo-burger { display: none; }
+
+        /* When sidebar is collapsed AND hovered, swap C for Hamburger */
+        #sidebar.collapsed #logo-link:hover #logo-c { display: none; }
+        #sidebar.collapsed #logo-link:hover #logo-burger { display: flex; }
+
+        /* TOOLTIPS */
+        .nav-tooltip { display: none; opacity: 0; transition: opacity 0.2s; }
+        #sidebar.collapsed .nav-item:hover .nav-tooltip { display: block; opacity: 1; }
+    </style>
+    <style media="print">
+        /* 1. Hide everything by default */
+        body * {
+            visibility: hidden;
+        }
+
+        /* 2. Unhide ONLY the invoice container and its children */
+        #invoice-container, #invoice-container * {
+            visibility: visible;
+        }
+
+        /* 3. Position the invoice at the very top-left of the page */
+        #invoice-container {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            border: none;
+            box-shadow: none;
+            background-color: white !important;
+            color: black !important;
+        }
+
+        /* 4. Force Light Mode Colors (Override Dark Mode) */
+        body {
+            background-color: white !important;
+            color: black !important;
+        }
+        .dark {
+            color-scheme: light; /* Forces browser to render standard form controls */
+        }
+
+        /* 5. Hide Sidebar, Header, and Buttons explicitly */
+        aside, header, nav, .print\:hidden {
+            display: none !important;
+        }
+    </style>
 </head>
 <body class="bg-gray-50 dark:bg-midnight-900 text-gray-600 dark:text-gray-400 font-sans antialiased h-screen flex overflow-hidden transition-colors duration-300">
 
-<aside class="w-64 flex flex-col border-r border-gray-200 dark:border-line bg-white dark:bg-midnight-900 flex-shrink-0 transition-colors duration-300">
-    <div class="h-16 flex items-center px-6 border-b border-gray-200 dark:border-line transition-colors duration-300">
-        <div class="w-8 h-8 rounded bg-accent-600 flex items-center justify-center text-white font-bold mr-3 shadow-lg shadow-accent-500/30">
-            C
-        </div>
-        <span class="text-gray-900 dark:text-gray-100 font-semibold tracking-wide">Clary</span>
+<aside id="sidebar" class="w-64 flex flex-col border-r border-gray-200 dark:border-line bg-white dark:bg-midnight-900 flex-shrink-0 relative z-20">
+
+    <div class="sidebar-header h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-line transition-all duration-300 overflow-hidden">
+
+        <a href="{{ route('dashboard') }}" id="logo-link" class="flex items-center gap-3 overflow-hidden group focus:outline-none w-full">
+
+            <div id="logo-container" class="w-8 h-8 rounded relative flex-shrink-0 transition-all duration-200 group-hover:shadow-lg group-hover:shadow-accent-500/30">
+                <div id="logo-c" class="absolute inset-0 bg-accent-600 rounded flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/30 group-hover:bg-blue-600 transition-colors">
+                    C
+                </div>
+                <div id="logo-burger" class="absolute inset-0 bg-blue-600 rounded items-center justify-center text-white shadow-lg shadow-blue-500/30">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <span class="sidebar-text font-semibold tracking-wide text-gray-900 dark:text-gray-100 whitespace-nowrap">Clary</span>
+        </a>
+
+        <button id="sidebarToggleBtn" class="sidebar-text p-1 rounded-md text-gray-400 hover:text-gray-600 dark:hover:text-white transition-colors focus:outline-none ml-auto">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
     </div>
 
-    <nav class="flex-1 overflow-y-auto py-6 px-3 flex flex-col">
-        <div class="space-y-1">
-            <a href="{{ route('dashboard') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('dashboard') ? 'bg-gray-100 dark:bg-midnight-800 text-accent-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-midnight-800 hover:text-gray-900 dark:hover:text-white' }}">
-                <svg class="mr-3 h-5 w-5 flex-shrink-0 {{ request()->routeIs('dashboard') ? 'text-accent-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-                Dashboard
-            </a>
+    <nav class="flex-1 overflow-y-auto overflow-x-hidden py-6 px-3 flex flex-col space-y-1 scrollbar-hide">
 
-            <a href="{{ route('clients.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('clients.*') ? 'bg-gray-100 dark:bg-midnight-800 text-accent-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-midnight-800 hover:text-gray-900 dark:hover:text-white' }}">
-                <svg class="mr-3 h-5 w-5 flex-shrink-0 {{ request()->routeIs('clients.*') ? 'text-accent-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                Clients
-            </a>
+        <a href="{{ route('dashboard') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+            {{ request()->routeIs('dashboard')
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400'
+            }}">
+            <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('dashboard') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            <span class="sidebar-text ml-3">Dashboard</span>
+            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Dashboard</div>
+        </a>
 
-            <a href="{{ route('projects.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('projects.*') ? 'bg-gray-100 dark:bg-midnight-800 text-accent-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-midnight-800 hover:text-gray-900 dark:hover:text-white' }}">
-                <svg class="mr-3 h-5 w-5 flex-shrink-0 {{ request()->routeIs('projects.*') ? 'text-accent-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
-                </svg>
-                Projects
-            </a>
+        <a href="{{ route('clients.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+            {{ request()->routeIs('clients.*')
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400'
+            }}">
+            <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('clients.*') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+            <span class="sidebar-text ml-3">Clients</span>
+            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Clients</div>
+        </a>
 
-            <a href="{{ route('tasks.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('tasks.*') ? 'bg-gray-100 dark:bg-midnight-800 text-accent-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-midnight-800 hover:text-gray-900 dark:hover:text-white' }}">
-                <svg class="mr-3 h-5 w-5 flex-shrink-0 {{ request()->routeIs('tasks.*') ? 'text-accent-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Tasks
-            </a>
+        <a href="{{ route('projects.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+            {{ request()->routeIs('projects.*')
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400'
+            }}">
+            <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('projects.*') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+            </svg>
+            <span class="sidebar-text ml-3">Projects</span>
+            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Projects</div>
+        </a>
 
-            <a href="{{ route('invoices.index') }}" class="flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('invoices.*') ? 'bg-gray-100 dark:bg-midnight-800 text-accent-600 dark:text-white' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-midnight-800 hover:text-gray-900 dark:hover:text-white' }}">
-                <svg class="mr-3 h-5 w-5 flex-shrink-0 {{ request()->routeIs('invoices.*') ? 'text-accent-600 dark:text-white' : 'text-gray-400 group-hover:text-gray-500' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Invoices
-            </a>
-        </div>
+        <a href="{{ route('tasks.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+            {{ request()->routeIs('tasks.*')
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400'
+            }}">
+            <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('tasks.*') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            </svg>
+            <span class="sidebar-text ml-3">Tasks</span>
+            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Tasks</div>
+        </a>
 
-        <div class="mt-8 px-3">
-            <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wider mb-3 px-3">Tags</h3>
+        <a href="{{ route('invoices.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors
+            {{ request()->routeIs('invoices.*')
+                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400'
+            }}">
+            <svg class="h-5 w-5 flex-shrink-0 {{ request()->routeIs('invoices.*') ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span class="sidebar-text ml-3">Invoices</span>
+            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Invoices</div>
+        </a>
+
+        <div class="mt-8">
+            <h3 class="sidebar-text px-3 text-xs font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wider mb-3 whitespace-nowrap">Tags</h3>
             <div class="space-y-1">
                 @if(count($tagCounts) > 0)
                     @foreach($tagCounts as $tagName => $count)
@@ -109,43 +252,47 @@
                             $style = $colors[$loop->index % count($colors)];
                             $isActive = request('tag') == $tagName;
                         @endphp
-                        <a href="{{ route('clients.index', ['tag' => $tagName]) }}" class="flex items-center justify-between px-3 py-1.5 rounded-md transition-colors hover:bg-gray-100 dark:hover:bg-midnight-800 group {{ $isActive ? 'bg-gray-100 dark:bg-midnight-800 ring-1 ring-accent-500' : '' }}">
-                            <div class="flex items-center">
-                                <span class="w-2 h-2 rounded-full {{ $style['bg'] }} mr-3" style="box-shadow: 0 0 8px {{ $style['shadow'] }}"></span>
-                                <span class="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white truncate max-w-[120px]">{{ $tagName }}</span>
+                        <a href="{{ route('clients.index', ['tag' => $tagName]) }}" class="nav-item group relative flex items-center px-3 py-1.5 rounded-md transition-colors
+                            {{ $isActive
+                                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500'
+                                : 'hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400'
+                            }}">
+                            <div class="flex items-center justify-center flex-shrink-0 w-5 h-5">
+                                <span class="w-2.5 h-2.5 rounded-full {{ $style['bg'] }}" style="box-shadow: 0 0 8px {{ $style['shadow'] }}"></span>
                             </div>
-                            <span class="text-xs text-gray-500 dark:text-gray-600">{{ $count }}</span>
+                            <div class="sidebar-text ml-3 flex-1 flex justify-between items-center overflow-hidden">
+                                <span class="text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ $tagName }}</span>
+                                <span class="text-xs text-gray-500 dark:text-gray-600 group-hover:text-blue-500">{{ $count }}</span>
+                            </div>
+                            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">{{ $tagName }}</div>
                         </a>
                     @endforeach
                 @else
-                    <div class="px-3 text-xs text-gray-500 dark:text-gray-600 italic">
-                        No tags found.<br>Create clients to see tags here.
-                    </div>
+                    <div class="sidebar-text px-3 text-xs text-gray-500 dark:text-gray-600 italic whitespace-nowrap overflow-hidden">No tags found.</div>
                 @endif
             </div>
         </div>
     </nav>
 
-    <div class="p-4 border-t border-gray-200 dark:border-line transition-colors duration-300">
-        <a href="{{ route('profile.edit') }}" class="flex items-center group">
-            <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-accent-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:ring-2 group-hover:ring-accent-500 transition-all">
+    <div class="sidebar-footer p-4 border-t border-gray-200 dark:border-line transition-all duration-300">
+        <a href="{{ route('profile.edit') }}" class="nav-item flex items-center group relative p-1 rounded hover:bg-blue-600/10 transition-colors">
+            <div class="h-9 w-9 flex-shrink-0 rounded-full bg-gradient-to-tr from-accent-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md group-hover:ring-2 group-hover:ring-blue-500 transition-all">
                 {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
             </div>
-            <div class="ml-3">
-                <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-accent-500 transition-colors">
+            <div class="sidebar-text ml-3 overflow-hidden whitespace-nowrap">
+                <p class="text-sm font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                     {{ Auth::user()->name ?? 'User' }}
                 </p>
-                <p class="text-xs text-gray-500 dark:text-gray-400 capitalize">
-                    {{-- Converts "super_admin" to "Super Admin" --}}
-                    {{ str_replace('_', ' ', Auth::user()->role) }}
+                <p class="text-xs text-gray-500 dark:text-gray-400 capitalize truncate">
+                    {{ str_replace('_', ' ', Auth::user()->role ?? 'Guest') }}
                 </p>
             </div>
+            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Profile</div>
         </a>
     </div>
 </aside>
 
 <main class="flex-1 flex flex-col min-w-0 bg-gray-50 dark:bg-midnight-900 transition-colors duration-300 overflow-hidden">
-
     <header class="h-16 border-b border-gray-200 dark:border-line flex items-center justify-between px-8 bg-white dark:bg-midnight-900 flex-shrink-0 transition-colors duration-300">
         <div class="flex-1 max-w-lg">
             <div class="relative">
@@ -154,10 +301,9 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                 </span>
-                <input type="text" class="w-full bg-gray-100 dark:bg-midnight-800 text-gray-900 dark:text-gray-200 border-none rounded-md py-2 pl-10 placeholder-gray-500 focus:ring-1 focus:ring-accent-500 text-sm transition-colors duration-300" placeholder="Search across projects, clients...">
+                <input type="text" class="w-full bg-gray-100 dark:bg-midnight-800 text-gray-900 dark:text-gray-200 border-none rounded-md py-2 pl-10 placeholder-gray-500 focus:ring-1 focus:ring-accent-500 text-sm transition-colors duration-300" placeholder="Search...">
             </div>
         </div>
-
         <div class="ml-6 flex items-center space-x-4">
             <button id="notificationsBtn" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-white transition-colors relative">
                 <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -165,52 +311,85 @@
                 </svg>
                 <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-midnight-900"></span>
             </button>
-
-            <button id="themeToggle" class="flex items-center px-2 py-1 bg-gray-100 dark:bg-midnight-800 rounded text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors" title="Toggle theme">
-                <svg id="themeIcon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                </svg>
+            <button id="themeToggle" class="flex items-center px-2 py-1 bg-gray-100 dark:bg-midnight-800 rounded text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
+                <svg id="themeIcon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
             </button>
-
             <div class="relative">
                 <button id="userMenuBtn" class="flex items-center text-sm focus:outline-none">
                     <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-accent-600 to-blue-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
                         {{ substr(Auth::user()->name ?? 'U', 0, 1) }}
                     </div>
-                    <svg class="ml-2 h-4 w-4 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                    </svg>
                 </button>
-
-                <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-midnight-800 border border-gray-200 dark:border-line rounded-md shadow-lg py-1 z-20 transition-all">
+                <div id="userMenu" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-midnight-800 border border-gray-200 dark:border-line rounded-md shadow-lg py-1 z-50">
                     <a href="{{ route('profile.edit') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-midnight-700">Profile</a>
-
-                    <form id="logoutForm" method="POST" action="{{ route('logout') }}">
+                    <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-midnight-700">Logout</button>
                     </form>
                 </div>
             </div>
-
         </div>
     </header>
 
-    <div class="flex-1 flex flex-col min-h-0 overflow-hidden">
+    <div class="flex-1 flex flex-col min-h-0 overflow-y-auto">
         {{ $slot }}
     </div>
 
 </main>
 
 <script>
+    // Sidebar Logic
+    (function() {
+        const sidebar = document.getElementById('sidebar');
+        const logoLink = document.getElementById('logo-link');
+        const toggleBtn = document.getElementById('sidebarToggleBtn'); // Only exists when expanded
+
+        const expandedClass = 'w-64';
+        const collapsedClass = 'w-20';
+
+        function toggleSidebar() {
+            const collapsed = sidebar.classList.toggle('collapsed');
+
+            if (collapsed) {
+                sidebar.classList.remove(expandedClass);
+                sidebar.classList.add(collapsedClass);
+            } else {
+                sidebar.classList.remove(collapsedClass);
+                sidebar.classList.add(expandedClass);
+            }
+            localStorage.setItem('sidebar-collapsed', collapsed);
+        }
+
+        // 1. Link Logic:
+        // If expanded -> Go to href (Dashboard).
+        // If collapsed -> Prevent default & Toggle sidebar (Expand).
+        logoLink.addEventListener('click', (e) => {
+            if (sidebar.classList.contains('collapsed')) {
+                e.preventDefault();
+                toggleSidebar();
+            }
+        });
+
+        // 2. Toggle Button Logic (Hamburger):
+        // Always toggles sidebar
+        toggleBtn.addEventListener('click', (e) => {
+            e.preventDefault(); // Just in case
+            toggleSidebar();
+        });
+
+        // Load saved state
+        const isCollapsed = localStorage.getItem('sidebar-collapsed') === 'true';
+        if (isCollapsed) {
+            sidebar.classList.add('collapsed', collapsedClass);
+            sidebar.classList.remove(expandedClass);
+        }
+    })();
+
     // Theme Logic
     (function() {
         const root = document.documentElement;
         const themeToggle = document.getElementById('themeToggle');
         const themeIcon = document.getElementById('themeIcon');
-
-        function isSystemDark() {
-            return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        }
-
         function applyTheme(theme) {
             if (theme === 'dark') {
                 root.classList.add('dark');
@@ -220,36 +399,23 @@
                 themeIcon.innerHTML = '<path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z\"/>';
             }
         }
-
         const stored = localStorage.getItem('theme');
-        const initial = stored ? stored : (isSystemDark() ? 'dark' : 'light');
+        const initial = stored ? stored : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         applyTheme(initial);
-
         themeToggle.addEventListener('click', function() {
-            const current = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
-            const next = current === 'dark' ? 'light' : 'dark';
+            const next = root.classList.contains('dark') ? 'light' : 'dark';
             localStorage.setItem('theme', next);
             applyTheme(next);
         });
     })();
 
-    // User Menu Logic
+    // User Menu
     (function() {
         const btn = document.getElementById('userMenuBtn');
         const menu = document.getElementById('userMenu');
-
-        document.addEventListener('click', function(e) {
-            if (!btn.contains(e.target) && !menu.contains(e.target)) {
-                menu.classList.add('hidden');
-            }
-        });
-
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            menu.classList.toggle('hidden');
-        });
+        document.addEventListener('click', e => { if(!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden'); });
+        btn.addEventListener('click', e => { e.preventDefault(); menu.classList.toggle('hidden'); });
     })();
 </script>
-
 </body>
 </html>

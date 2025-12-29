@@ -14,7 +14,7 @@ class Project extends Model
         'name',
         'description',
         'start_date',
-        'end_date',
+        'end_date', // This matches your DB
         'budget',
         'status',
     ];

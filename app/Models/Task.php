@@ -8,14 +8,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Task extends Model
 {
     protected $fillable = [
-        'user_id',
+        'user_id',      // REQUIRED in your DB
         'project_id',
-        'assigned_to',
-        'title',
+        'title',        // CHANGED: was 'name'
         'description',
-        'due_date',
-        'priority',
         'status',
+        'priority',     // NEW: found in your DB
+        'due_date',
+        'assigned_to',  // Optional, but good to have
     ];
 
     protected $casts = [
@@ -27,8 +27,8 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    public function assignedUser(): BelongsTo
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assigned_to');
+        return $this->belongsTo(User::class);
     }
 }
