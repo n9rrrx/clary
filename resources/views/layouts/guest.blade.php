@@ -29,7 +29,7 @@
     </div>
 
     <div class="mt-6 text-center text-xs text-gray-400 dark:text-gray-500">
-        &copy; {{ date('Y') }} Clary App. All rights reserved.
+        &copy; {{ date('Y') }} Clary. All rights reserved.
     </div>
 </div>
 </body>
