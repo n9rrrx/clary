@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
-use App\Models\Client; // Optional: if you want to filter projects by client
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TaskController extends Controller
 {
@@ -14,8 +14,28 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::with('project.client')->latest()->paginate(15);
-        return view('tasks.index', compact('tasks'));
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        $query = Task::with(['project.client', 'assignedTo'])->latest();
+
+        if ($team) {
+            $query->where('team_id', $team->id);
+
+            // If user is not owner, only show tasks assigned to them
+            if (!$user->isOwnerOfCurrentTeam()) {
+                $query->where('assigned_to_user_id', $user->id);
+            }
+        }
+
+        $tasks = $query->paginate(15);
+        
+        // Get team members for assignment dropdown (owners only)
+        $teamMembers = $user->isOwnerOfCurrentTeam() && $team 
+            ? $team->members()->get() 
+            : collect();
+
+        return view('tasks.index', compact('tasks', 'teamMembers'));
     }
 
     /**
@@ -23,9 +43,18 @@ class TaskController extends Controller
      */
     public function create()
     {
-        // We need projects to select from when creating a task
-        $projects = Project::where('status', '!=', 'cancelled')->get();
-        return view('tasks.create', compact('projects'));
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        // Get projects for this team
+        $projects = $team 
+            ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get()
+            : collect();
+
+        // Get team members for assignment
+        $teamMembers = $team ? $team->members()->get() : collect();
+
+        return view('tasks.create', compact('projects', 'teamMembers'));
     }
 
     /**
@@ -33,6 +62,9 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
         $validated = $request->validate([
             'project_id' => 'required|exists:projects,id',
             'title' => 'required|string|max:255',
@@ -40,11 +72,14 @@ class TaskController extends Controller
             'status' => 'required|in:pending,in_progress,completed',
             'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable|date',
+            'assigned_to_user_id' => 'nullable|exists:users,id',
         ]);
+
+        $validated['team_id'] = $team?->id;
 
         Task::create($validated);
 
-        return redirect()->route('dashboard', ['tab' => 'tasks'])
+        return redirect()->route('tasks.index')
             ->with('success', 'Task created successfully.');
     }
 
@@ -53,8 +88,7 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        // This is the method hit by /tasks/1
-        $task->load('project.client');
+        $task->load(['project.client', 'assignedTo']);
         return view('tasks.show', compact('task'));
     }
 
@@ -63,8 +97,16 @@ class TaskController extends Controller
      */
     public function edit(Task $task)
     {
-        $projects = Project::where('status', '!=', 'cancelled')->get();
-        return view('tasks.edit', compact('task', 'projects'));
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        $projects = $team 
+            ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get()
+            : collect();
+
+        $teamMembers = $team ? $team->members()->get() : collect();
+
+        return view('tasks.edit', compact('task', 'projects', 'teamMembers'));
     }
 
     /**
@@ -79,6 +121,7 @@ class TaskController extends Controller
             'status' => 'required|in:pending,in_progress,completed',
             'priority' => 'required|in:low,medium,high',
             'due_date' => 'nullable|date',
+            'assigned_to_user_id' => 'nullable|exists:users,id',
         ]);
 
         $task->update($validated);

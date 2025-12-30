@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Invoice extends Model
 {
     protected $fillable = [
-        'user_id',
+        'team_id',
         'client_id',
         'project_id',
         'invoice_number',
@@ -35,7 +35,7 @@ class Invoice extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function client(): BelongsTo
+    public function client()
     {
         return $this->belongsTo(Client::class);
     }

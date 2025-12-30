@@ -2,45 +2,29 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var list<string>
-     */
     protected $fillable = [
         'name',
         'email',
         'password',
         'role',
-        'company_id',
+        'current_team_id',
     ];
 
-    /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var list<string>
-     */
     protected $hidden = [
         'password',
         'remember_token',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -49,33 +33,48 @@ class User extends Authenticatable
         ];
     }
 
-    public function company()
+    // --- TEAM RELATIONSHIPS ---
+
+    /**
+     * Get all teams this user belongs to
+     */
+    public function teams(): BelongsToMany
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsToMany(Team::class, 'team_user')
+            ->withPivot(['role', 'budget_limit', 'allowed_tabs'])
+            ->withTimestamps();
     }
 
-    public function isSuperAdmin(): bool
+    /**
+     * Get the user's current active team
+     */
+    public function currentTeam(): BelongsTo
     {
-        return $this->role === 'super_admin';
+        return $this->belongsTo(Team::class, 'current_team_id');
     }
 
-    public function isCompanyAdmin(): bool
+    /**
+     * Get teams this user owns
+     */
+    public function ownedTeams()
     {
-        return $this->role === 'company_admin';
+        return $this->hasMany(Team::class, 'owner_id');
     }
 
-    public function isUser(): bool
+    /**
+     * Check if user is owner of their current team
+     */
+    public function isOwnerOfCurrentTeam(): bool
     {
-        return $this->role === 'user';
+        return $this->currentTeam && $this->currentTeam->owner_id === $this->id;
     }
 
-    public function clients(): HasMany
+    /**
+     * Get all projects this user is assigned to
+     */
+    public function projects(): BelongsToMany
     {
-        return $this->hasMany(Client::class);
-    }
-
-    public function agencyProfile()
-    {
-        return $this->hasOne(AgencyProfile::class);
+        return $this->belongsToMany(Project::class, 'project_user')
+            ->withTimestamps();
     }
 }

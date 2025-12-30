@@ -133,6 +133,49 @@
                 </div>
 
                 <div class="bg-white dark:bg-midnight-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-bold">Team Members</h3>
+                        @if(Auth::user()->isOwnerOfCurrentTeam() && isset($teamMembers) && $teamMembers->count() > 0)
+                            <button onclick="document.getElementById('assignMemberModal').classList.remove('hidden')" 
+                                    class="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                                + Add
+                            </button>
+                        @endif
+                    </div>
+                    
+                    @if($project->members->count() > 0)
+                        <div class="space-y-2 mb-4">
+                            @foreach($project->members as $member)
+                                <div class="flex items-center justify-between p-2 rounded-md bg-gray-50 dark:bg-midnight-900 border border-gray-100 dark:border-gray-700">
+                                    <div class="flex items-center gap-2">
+                                        <div class="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                                            {{ strtoupper(substr($member->name, 0, 1)) }}
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ $member->name }}</p>
+                                            <p class="text-xs text-gray-500 dark:text-gray-400">{{ $member->email }}</p>
+                                        </div>
+                                    </div>
+                                    @if(Auth::user()->isOwnerOfCurrentTeam())
+                                        <form action="{{ route('projects.members.remove', [$project->id, $member->id]) }}" method="POST" class="inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="text-red-500 hover:text-red-700 p-1" title="Remove from project">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                        </form>
+                                    @endif
+                                </div>
+                            @endforeach
+                        </div>
+                    @else
+                        <p class="text-sm text-gray-500 dark:text-gray-400 italic mb-4">No team members assigned yet.</p>
+                    @endif
+                </div>
+
+                <div class="bg-white dark:bg-midnight-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-800 p-6">
                     <h3 class="text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400 font-bold mb-4">Project Details</h3>
 
                     <div class="space-y-4">
@@ -188,4 +231,50 @@
             </div>
         </div>
     </div>
+
+    <!-- Assign Member Modal -->
+    @if(Auth::user()->isOwnerOfCurrentTeam() && isset($teamMembers) && $teamMembers->count() > 0)
+    <div id="assignMemberModal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+        <div class="flex min-h-full items-center justify-center p-4">
+            <div class="fixed inset-0 bg-black/50" onclick="document.getElementById('assignMemberModal').classList.add('hidden')"></div>
+            
+            <div class="relative bg-white dark:bg-midnight-800 rounded-xl shadow-xl w-full max-w-md p-6">
+                <button onclick="document.getElementById('assignMemberModal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+
+                <h2 class="text-xl font-bold text-gray-900 dark:text-white mb-2">Assign Team Member</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Add a team member to work on this project.</p>
+
+                <form action="{{ route('projects.members.assign', $project->id) }}" method="POST" class="space-y-4">
+                    @csrf
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Team Member</label>
+                        <select name="user_id" required
+                                class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-midnight-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">Select a team member...</option>
+                            @foreach($teamMembers as $member)
+                                @if(!$project->members->contains($member->id))
+                                    <option value="{{ $member->id }}">{{ $member->name }} ({{ $member->email }})</option>
+                                @endif
+                            @endforeach
+                        </select>
+                        @if($project->members->count() >= $teamMembers->count())
+                            <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">All team members are already assigned to this project.</p>
+                        @endif
+                    </div>
+
+                    <div class="pt-4">
+                        <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/30 transition-all">
+                            Assign to Project
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
 </x-app-layout>

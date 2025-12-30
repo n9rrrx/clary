@@ -13,10 +13,17 @@ class InvoiceController extends Controller
 {
     public function index()
     {
-        $invoices = Invoice::where('user_id', Auth::id())
-            ->with(['client', 'project'])
-            ->latest()
-            ->get();
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        $query = Invoice::with(['client', 'project'])->latest();
+
+        // Scope to current team
+        if ($team) {
+            $query->where('team_id', $team->id);
+        }
+
+        $invoices = $query->get();
 
         return view('invoices.index', compact('invoices'));
     }
@@ -24,17 +31,16 @@ class InvoiceController extends Controller
     public function create()
     {
         $user = Auth::user();
+        $team = $user->currentTeam;
 
-        // FIX: If Super Admin, show ALL clients. Otherwise, show only MY clients.
-        if ($user->role === 'super_admin') {
-            $clients = Client::all();
-            $projects = Project::all();
-        } else {
-            $clients = Client::where('user_id', $user->id)->get();
-            $projects = Project::where('user_id', $user->id)->get();
+        // Only owners can create invoices
+        if (!$user->isOwnerOfCurrentTeam()) {
+            abort(403, 'Only team owners can create invoices.');
         }
 
-        // Generate Invoice Number
+        $clients = $team ? Client::where('team_id', $team->id)->get() : collect();
+        $projects = $team ? Project::where('team_id', $team->id)->get() : collect();
+
         $nextNumber = 'INV-' . strtoupper(Str::random(5));
 
         return view('invoices.create', compact('clients', 'projects', 'nextNumber'));
@@ -42,6 +48,13 @@ class InvoiceController extends Controller
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$user->isOwnerOfCurrentTeam()) {
+            abort(403);
+        }
+
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'project_id' => 'nullable|exists:projects,id',
@@ -55,10 +68,8 @@ class InvoiceController extends Controller
         ]);
 
         $invoice = new Invoice($validated);
-        $invoice->user_id = Auth::id();
+        $invoice->team_id = $team?->id;
         $invoice->tax = $request->tax ?? 0;
-
-        // Auto-calculate Total
         $invoice->total = $invoice->subtotal + $invoice->tax;
 
         $invoice->save();
@@ -68,36 +79,62 @@ class InvoiceController extends Controller
 
     public function show($id)
     {
-        $invoice = Invoice::where('user_id', Auth::id())
-            ->with(['client', 'project'])
-            ->findOrFail($id);
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        $query = Invoice::with(['client', 'project']);
+
+        if ($team) {
+            $query->where('team_id', $team->id);
+        }
+
+        $invoice = $query->findOrFail($id);
 
         return view('invoices.show', compact('invoice'));
     }
+
     public function edit($id)
     {
-        $invoice = Invoice::where('user_id', Auth::id())->findOrFail($id);
-
         $user = Auth::user();
-        if ($user->role === 'super_admin') {
-            $clients = Client::all();
-            $projects = Project::all();
-        } else {
-            $clients = Client::where('user_id', $user->id)->get();
-            $projects = Project::where('user_id', $user->id)->get();
+        $team = $user->currentTeam;
+
+        if (!$user->isOwnerOfCurrentTeam()) {
+            abort(403);
         }
+
+        $query = Invoice::query();
+
+        if ($team) {
+            $query->where('team_id', $team->id);
+        }
+
+        $invoice = $query->findOrFail($id);
+
+        $clients = $team ? Client::where('team_id', $team->id)->get() : collect();
+        $projects = $team ? Project::where('team_id', $team->id)->get() : collect();
 
         return view('invoices.edit', compact('invoice', 'clients', 'projects'));
     }
 
     public function update(Request $request, $id)
     {
-        $invoice = Invoice::where('user_id', Auth::id())->findOrFail($id);
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$user->isOwnerOfCurrentTeam()) {
+            abort(403);
+        }
+
+        $query = Invoice::query();
+        if ($team) {
+            $query->where('team_id', $team->id);
+        }
+
+        $invoice = $query->findOrFail($id);
 
         $validated = $request->validate([
             'client_id' => 'required|exists:clients,id',
             'project_id' => 'nullable|exists:projects,id',
-            // Ignore current invoice ID in unique check
             'invoice_number' => 'required|string|unique:invoices,invoice_number,' . $invoice->id,
             'issue_date' => 'required|date',
             'due_date' => 'required|date|after_or_equal:issue_date',
@@ -113,5 +150,25 @@ class InvoiceController extends Controller
         $invoice->save();
 
         return redirect()->route('invoices.show', $invoice->id)->with('success', 'Invoice updated successfully.');
+    }
+
+    public function destroy($id)
+    {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$user->isOwnerOfCurrentTeam()) {
+            abort(403);
+        }
+
+        $query = Invoice::query();
+        if ($team) {
+            $query->where('team_id', $team->id);
+        }
+
+        $invoice = $query->findOrFail($id);
+        $invoice->delete();
+
+        return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
     }
 }

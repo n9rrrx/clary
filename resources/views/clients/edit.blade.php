@@ -17,7 +17,7 @@
                 @csrf
                 @method('PUT')
 
-                @if(Auth::user()->role === 'super_admin')
+                @if(Auth::user()->role === 'super_admin' || Auth::user()->role === 'admin')
                     <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200 dark:border-purple-800">
                         <label class="block text-sm font-bold text-purple-800 dark:text-purple-300 mb-1">
                             Assign to Agency (Super Admin Action)
@@ -46,6 +46,35 @@
                     <x-input-error :messages="$errors->get('email')" class="mt-2" />
                 </div>
 
+                <div class="bg-blue-50 dark:bg-blue-900/10 p-6 rounded-lg border border-blue-100 dark:border-blue-900/30 space-y-4">
+                    <h3 class="text-sm font-bold text-blue-900 dark:text-blue-300 uppercase tracking-wider">Portal Access & Assignment</h3>
+
+                    <div>
+                        <label class="block text-sm font-medium text-blue-800 dark:text-blue-400 mb-1">Assigned Admin Email</label>
+                        {{-- We display the email as readonly because it is the unique ID for the user account --}}
+                        <input type="email" name="email" readonly value="{{ $client->email }}"
+                               class="w-full rounded-lg bg-gray-100 dark:bg-midnight-700 border-gray-300 dark:border-gray-700 text-gray-500 cursor-not-allowed">
+                        <p class="mt-1 text-xs text-blue-600 dark:text-blue-400">The login email is locked to this site profile.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-blue-800 dark:text-blue-400 mb-1">Update Assigned Role (Money/Role Flow)</label>
+                            <input type="text" name="assigned_role" required value="{{ old('assigned_role', $linkedUser->designation ?? '') }}"
+                                   class="w-full rounded-lg bg-white dark:bg-midnight-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-accent-500 focus:border-accent-500">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-blue-800 dark:text-blue-400 mb-1">Update Allocated Budget ($)</label>
+                            <input type="number" name="budget" step="0.01" required value="{{ old('budget', $client->budget) }}"
+                                   class="w-full rounded-lg bg-white dark:bg-midnight-900 border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white focus:ring-accent-500 focus:border-accent-500">
+                        </div>
+                    </div>
+
+                    <p class="text-xs text-blue-600 dark:text-blue-400 italic">
+                        Changing these values will update the Site Admin's profile immediately.
+                    </p>
+                </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client Type</label>
@@ -67,8 +96,6 @@
                 </div>
 
                 @php
-                    // Decode the existing tags from the database (e.g., ["Developer"])
-                    // We grab the first one to pre-select the dropdown
                     $currentTags = is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []);
                     $firstTag = $currentTags[0] ?? '';
                 @endphp

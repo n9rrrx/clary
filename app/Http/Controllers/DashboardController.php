@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $user = Auth::user();
 
         // =========================================================
-        // 1. CLIENT PORTAL LOGIC (For users like "him")
+        // 1. CLIENT PORTAL LOGIC (For client users)
         // =========================================================
         if ($user->role === 'user') {
             $clientProfile = Client::where('email', $user->email)->first();
@@ -36,15 +36,18 @@ class DashboardController extends Controller
         }
 
         // =========================================================
-        // 2. AGENCY / ADMIN DASHBOARD LOGIC (For You)
+        // 2. AGENCY / ADMIN DASHBOARD LOGIC
         // =========================================================
 
-        // Fetch Client List
+        // Get the user's team IDs
+        $teamIds = $user->teams()->pluck('teams.id')->toArray();
+
+        // Fetch Client List - filter by teams the user belongs to
         $sort = $request->get('sort', 'desc');
         $query = Client::with('latestActivity.user')->orderBy('updated_at', $sort);
 
-        if ($user->role !== 'super_admin') {
-            $query->where('user_id', $user->id);
+        if ($user->role !== 'super_admin' && !empty($teamIds)) {
+            $query->whereIn('team_id', $teamIds);
         }
 
         $updates = $query->get();
@@ -52,8 +55,8 @@ class DashboardController extends Controller
         // Determine Selected Client
         if ($request->has('client_id')) {
             $check = Client::where('id', $request->client_id);
-            if ($user->role !== 'super_admin') {
-                $check->where('user_id', $user->id);
+            if ($user->role !== 'super_admin' && !empty($teamIds)) {
+                $check->whereIn('team_id', $teamIds);
             }
             $selectedClient = $check->first();
         } else {
@@ -68,13 +71,11 @@ class DashboardController extends Controller
         $clientTasks = collect();
 
         if ($selectedClient) {
-            // === NEW: MARK MESSAGES AS SEEN ===
-            // When Admin views this client, mark client's unread messages as READ
+            // Mark messages as seen
             Activity::where('client_id', $selectedClient->id)
-                ->where('user_id', '!=', Auth::id()) // Messages from the client
+                ->where('user_id', '!=', Auth::id())
                 ->whereNull('read_at')
                 ->update(['read_at' => now()]);
-            // ==================================
 
             $feed = Activity::where('client_id', $selectedClient->id)
                 ->with('user')
@@ -104,7 +105,6 @@ class DashboardController extends Controller
             'body' => $request->body,
         ]);
 
-        // FIX: If the request comes from JavaScript, return JSON instead of reloading page
         if ($request->wantsJson()) {
             return response()->json(['status' => 'success']);
         }

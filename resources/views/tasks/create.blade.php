@@ -40,9 +40,8 @@
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                         <select name="status" id="status" required
                                 class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
-                            <option value="todo">To Do</option>
+                            <option value="pending">Pending</option>
                             <option value="in_progress">In Progress</option>
-                            <option value="review">Review</option>
                             <option value="completed">Completed</option>
                         </select>
                         @error('status') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
@@ -55,7 +54,6 @@
                             <option value="low">Low</option>
                             <option value="medium" selected>Medium</option>
                             <option value="high">High</option>
-                            <option value="urgent">Urgent</option>
                         </select>
                         @error('priority') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
@@ -67,6 +65,20 @@
                         @error('due_date') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
                 </div>
+
+                @if(isset($teamMembers) && $teamMembers->count() > 0)
+                <div>
+                    <label for="assigned_to_user_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Assign To</label>
+                    <select name="assigned_to_user_id" id="assigned_to_user_id"
+                            class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
+                        <option value="">Unassigned</option>
+                        @foreach($teamMembers as $member)
+                            <option value="{{ $member->id }}">{{ $member->name }} ({{ $member->email }})</option>
+                        @endforeach
+                    </select>
+                    @error('assigned_to_user_id') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+                @endif
 
                 <div>
                     <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
