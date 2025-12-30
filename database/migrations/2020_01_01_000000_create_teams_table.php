@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            $table->json('tags')->nullable()->after('status'); // Stores ["Developer", "Partner"]
+        Schema::create('teams', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->string('slug')->unique(); // For URLs like app.com/nexgen
+            $table->foreignId('owner_id')->constrained('users'); // The Big Boss
+            $table->timestamps();
         });
     }
 
@@ -21,8 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('clients', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('teams');
     }
 };

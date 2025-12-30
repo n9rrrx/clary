@@ -1,11 +1,41 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto py-10 px-4 sm:px-6 lg:px-8">
 
+        <!-- Member Info Banner (for non-owners) -->
+        @if(!Auth::user()->isOwnerOfCurrentTeam() && Auth::user()->currentTeam)
+            @php
+                $membership = Auth::user()->teams()->where('team_id', Auth::user()->current_team_id)->first();
+                $budget = $membership?->pivot?->budget_limit ?? 0;
+                $role = $membership?->pivot?->role ?? 'member';
+            @endphp
+            <div class="mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border border-blue-200 dark:border-blue-800 rounded-xl">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-lg">
+                            {{ strtoupper(substr(Auth::user()->currentTeam->name, 0, 1)) }}
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-gray-900 dark:text-white">{{ Auth::user()->currentTeam->name }}</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 capitalize">Role: {{ $role }}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-6">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">${{ number_format($budget, 2) }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">Your Budget</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
         <div class="flex items-center justify-between mb-8">
             <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Invoices</h1>
-            <a href="{{ route('invoices.create') }}" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all">
-                + New Invoice
-            </a>
+            @if(Auth::user()->isOwnerOfCurrentTeam())
+                <a href="{{ route('invoices.create') }}" class="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all">
+                    + New Invoice
+                </a>
+            @endif
         </div>
 
         <div class="bg-white dark:bg-midnight-800 overflow-hidden shadow-sm sm:rounded-lg border border-gray-200 dark:border-gray-800">

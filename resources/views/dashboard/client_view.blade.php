@@ -50,7 +50,7 @@
                                             </span>
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <a href="{{ route('invoices.show', $invoice->id) }}" class="text-blue-600 hover:underline text-xs">View</a>
+                                        <a href="{{ route('clients.invoices.show', $invoice->id) }}" class="text-blue-600 hover:underline text-xs">View</a>
                                     </td>
                                 </tr>
                             @endforeach
@@ -101,3 +101,4 @@
         @endif
     </div>
 </x-client-layout>
+

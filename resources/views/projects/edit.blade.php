@@ -24,30 +24,16 @@
                     @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
-                <div>
-                    <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client</label>
-                    <select name="client_id" id="client_id" required
-                            class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
-                        @foreach($clients as $client)
-                            <option value="{{ $client->id }}" {{ old('client_id', $project->client_id) == $client->id ? 'selected' : '' }}>
-                                {{ $client->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                    @error('client_id') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
-                </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                         <select name="status" id="status" required
                                 class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
-                            @foreach(['planning', 'in_progress', 'on_hold', 'completed', 'cancelled'] as $status)
-                                <option value="{{ $status }}" {{ old('status', $project->status) == $status ? 'selected' : '' }}>
-                                    {{ ucwords(str_replace('_', ' ', $status)) }}
-                                </option>
-                            @endforeach
+                            <option value="planning" {{ old('status', $project->status) == 'planning' ? 'selected' : '' }}>Not Started</option>
+                            <option value="in_progress" {{ old('status', $project->status) == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                            <option value="on_hold" {{ old('status', $project->status) == 'on_hold' ? 'selected' : '' }}>On Hold</option>
+                            <option value="completed" {{ old('status', $project->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                            <option value="cancelled" {{ old('status', $project->status) == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
                         </select>
                         @error('status') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>

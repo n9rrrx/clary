@@ -3,178 +3,144 @@
 namespace App\Http\Controllers;
 
 use App\Models\Client;
-use App\Models\User; // <--- Added User model
+use App\Models\User;
+use App\Mail\TeamInvitation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class ClientController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of all Clients (scoped to team).
      */
     public function index(Request $request)
     {
-        // Start the query
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
         $query = Client::query();
 
-        // 1. FILTER: If a 'tag' is clicked, filter by it
+        // Filter by sidebar tags if present
         if ($request->has('tag')) {
-            // We use whereJsonContains because tags are stored as ["Tag1", "Tag2"]
             $query->whereJsonContains('tags', $request->tag);
         }
 
-        // 2. ROLE LOGIC:
-        if (Auth::user()->role === 'super_admin') {
-            // Super Admin: See ALL, but eager load the Owner details
-            // Order by 'user_id' so clients from the same agency stay together
-            $query->with('user')->orderBy('user_id');
-        } else {
-            // Agency Admin: See only YOURS
-            $query->where('user_id', Auth::id());
+        // Scope to current team
+        if ($team) {
+            $query->where('team_id', $team->id);
         }
 
-        // 3. Final Sort & Fetch
-        // We add a secondary sort by date so newest are top within the agency group
         $clients = $query->orderByDesc('updated_at')->get();
 
         return view('clients.index', compact('clients'));
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Show the form for creating a new Client.
      */
     public function create()
     {
-        // LOGIC UPDATE: Fetch list of Agencies for the dropdown
-        $agencies = [];
-        if (Auth::user()->role === 'super_admin') {
-            $agencies = User::where('role', 'admin')->get();
-        }
-
-        return view('clients.create', compact('agencies'));
+        return view('clients.create');
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a new Client.
      */
     public function store(Request $request)
     {
-        // 1. Define Rules
-        $rules = [
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'type' => 'required|in:customer,lead,partner,prospect',
             'status' => 'required|in:active,inactive',
             'tag' => 'required|in:Developer,Designer,Partner,Prospect',
-        ];
+            'budget' => 'nullable|numeric',
+        ]);
 
-        // 2. Extra Rule for Super Admin
-        if (Auth::user()->role === 'super_admin') {
-            $rules['owner_id'] = 'required|exists:users,id';
-        }
-
-        $validated = $request->validate($rules);
-
-        // 3. Determine Owner
-        // If Super Admin, use the picked owner. If Agency Admin, use themselves.
-        $ownerId = Auth::user()->role === 'super_admin'
-            ? $validated['owner_id']
-            : Auth::id();
-
-        // 4. Process Tags
-        $tagsJson = json_encode([$validated['tag']]);
-
-        // 5. Create Client
-        // We use Client::create instead of $user->clients()->create so we can manually set user_id
         Client::create([
-            'user_id' => $ownerId,
+            'team_id' => $team?->id,
             'name' => $validated['name'],
             'email' => $validated['email'],
             'type' => $validated['type'],
             'status' => $validated['status'],
-            'tags' => $tagsJson,
+            'tags' => json_encode([$validated['tag']]),
+            'budget' => $validated['budget'] ?? 0,
         ]);
 
-        return redirect()->route('clients.index');
+        return redirect()->route('clients.index')->with('success', 'Client created successfully.');
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the edit form.
      */
     public function edit(Client $client)
     {
-        // Security: Allow if owner OR super_admin
-        if ($client->user_id !== Auth::id() && Auth::user()->role !== 'super_admin') {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        // Permission check: Client must belong to user's team
+        if ($team && $client->team_id !== $team->id) {
             abort(403);
         }
 
-        // LOGIC UPDATE: Fetch list of Agencies for the dropdown (Super Admin only)
-        $agencies = [];
-        if (Auth::user()->role === 'super_admin') {
-            $agencies = User::where('role', 'admin')->get();
-        }
-
-        return view('clients.edit', compact('client', 'agencies'));
+        return view('clients.edit', compact('client'));
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update an existing Client.
      */
     public function update(Request $request, Client $client)
     {
-        // Security Check
-        if ($client->user_id !== Auth::id() && Auth::user()->role !== 'super_admin') {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        // Authorization
+        if ($team && $client->team_id !== $team->id) {
             abort(403);
         }
 
-        // 1. Validate (Using 'tag' singular, matching the dropdown)
-        $rules = [
+        $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'type' => 'required|in:customer,lead,partner,prospect',
             'status' => 'required|in:active,inactive',
-            'tag' => 'required|in:Developer,Designer,Partner,Prospect', // <--- FIXED
-        ];
+            'tag' => 'required|in:Developer,Designer,Partner,Prospect',
+            'budget' => 'nullable|numeric',
+        ]);
 
-        if (Auth::user()->role === 'super_admin') {
-            $rules['owner_id'] = 'required|exists:users,id';
-        }
-
-        $validated = $request->validate($rules);
-
-        // 2. Process Tag (Wrap the single tag in an array)
-        $tagsJson = json_encode([$validated['tag']]);
-
-        // 3. Prepare Data
-        $data = [
+        $client->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'type' => $validated['type'],
             'status' => $validated['status'],
-            'tags' => $tagsJson, // <--- Save the array
-        ];
+            'tags' => json_encode([$validated['tag']]),
+            'budget' => $validated['budget'] ?? 0,
+        ]);
 
-        // 4. Update Owner (Super Admin only)
-        if (Auth::user()->role === 'super_admin') {
-            $data['user_id'] = $validated['owner_id'];
-        }
-
-        $client->update($data);
-
-        return redirect()->route('clients.index');
+        return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete the client.
      */
     public function destroy(Client $client)
     {
-        if ($client->user_id !== Auth::id() && Auth::user()->role !== 'super_admin') {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if ($team && $client->team_id !== $team->id) {
             abort(403);
         }
 
         $client->delete();
 
-        return redirect()->route('clients.index');
+        return redirect()->route('clients.index')->with('success', 'Client deleted successfully.');
     }
 }

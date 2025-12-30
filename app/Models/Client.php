@@ -12,36 +12,44 @@ class Client extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'name',
-        'email',
-        'type',
-        'phone',
-        'company',
-        'address',
-        'notes',
-        'status',
-        'tags',
+        'team_id', 'name', 'email', 'phone',
+        'type', 'tags', 'address'
     ];
 
+    protected $casts = [
+        'tags' => 'array',
+    ];
+
+    /**
+     * Get the team/workspace this client belongs to.
+     */
+    public function team(): BelongsTo
+    {
+        return $this->belongsTo(Team::class);
+    }
+
+    /**
+     * Get the projects for the client.
+     */
     public function projects(): HasMany
     {
         return $this->hasMany(Project::class);
     }
 
+    /**
+     * Get the invoices for the client.
+     */
     public function invoices(): HasMany
     {
         return $this->hasMany(Invoice::class);
     }
 
+    /**
+     * Get the activities for the client.
+     */
     public function activities()
     {
         return $this->hasMany(Activity::class)->latest();
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function latestActivity()

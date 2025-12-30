@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('user')->after('email'); // super_admin, company_admin, user
-            $table->foreignId('company_id')->nullable()->after('role')->constrained()->onDelete('cascade');
+            // Role column: owner, admin, member, user (client), super_admin
+            $table->string('role')->default('owner')->after('email');
         });
     }
 
@@ -23,8 +23,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['company_id']);
-            $table->dropColumn(['role', 'company_id']);
+            $table->dropColumn('role');
         });
     }
 };
