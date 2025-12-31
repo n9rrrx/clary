@@ -16,17 +16,19 @@ class TeamInvitation extends Mailable
     public $clientName;
     public $budget;
     public $assignedRole;
+    public $assignedProject;
 
     /**
      * Build the invitation with Role and Budget details
      */
-    public function __construct(User $user, $password, $clientName, $budget = 0, $assignedRole = 'Member')
+    public function __construct(User $user, $password, $clientName, $budget = 0, $assignedRole = 'Member', $assignedProject = null)
     {
         $this->user = $user;
         $this->password = $password;
         $this->clientName = $clientName;
         $this->budget = $budget;
         $this->assignedRole = $assignedRole;
+        $this->assignedProject = $assignedProject;
     }
 
     public function build()

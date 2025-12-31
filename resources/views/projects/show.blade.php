@@ -123,7 +123,7 @@
                         </div>
                         <div>
                             <p class="text-sm font-bold text-gray-900 dark:text-white">{{ $project->client->name ?? 'Unknown' }}</p>
-                            @if($project->client->email)
+                            @if($project->client && $project->client->email)
                                 <p class="text-xs text-gray-500 hover:text-blue-500 transition-colors">
                                     <a href="mailto:{{ $project->client->email }}">{{ $project->client->email }}</a>
                                 </p>

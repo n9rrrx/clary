@@ -8,6 +8,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TeamMemberController;
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AgencyProfileController;
@@ -19,6 +20,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Plan-specific registration routes
+Route::get('/register/{plan?}', [SubscriptionController::class, 'showRegistration'])
+    ->name('register.plan')
+    ->where('plan', 'free|pro|enterprise');
+
 // Authentication Routes
 require __DIR__.'/auth.php';
 
@@ -27,7 +33,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // 1. DASHBOARD
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // 2. RESOURCES
     Route::resource('clients', ClientController::class);
     Route::resource('projects', ProjectController::class);
@@ -35,7 +41,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/projects/{project}/members/{user}', [ProjectController::class, 'removeMember'])->name('projects.members.remove');
     Route::resource('tasks', TaskController::class);
     Route::resource('invoices', InvoiceController::class);
-    
+
     Route::post('/dashboard/activity', [DashboardController::class, 'storeActivity'])->name('dashboard.activity.store');
 
     // 3. USER/TEAM MANAGEMENT (For Owners)
@@ -48,14 +54,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // 5. ADMIN CHAT API (For Dashboard Polling)
+    // 5. SUBSCRIPTION MANAGEMENT
+    Route::get('/subscription', [SubscriptionController::class, 'manage'])->name('subscription.manage');
+    Route::post('/subscription/upgrade', [SubscriptionController::class, 'upgrade'])->name('subscription.upgrade');
+    Route::post('/subscription/cancel', [SubscriptionController::class, 'cancel'])->name('subscription.cancel');
+    Route::post('/subscription/resume', [SubscriptionController::class, 'resume'])->name('subscription.resume');
+    Route::get('/subscription/invoice/{invoiceId}', [SubscriptionController::class, 'downloadInvoice'])->name('subscription.invoice');
+
+    // 6. ADMIN CHAT API (For Dashboard Polling)
     Route::get('/dashboard/chat/{client}/messages', [ChatController::class, 'adminFetch'])->name('admin.chat.fetch');
 
-    // 6. SETTINGS
+    // 7. SETTINGS
     Route::get('/settings', [AgencyProfileController::class, 'edit'])->name('settings.edit');
     Route::post('/settings', [AgencyProfileController::class, 'update'])->name('settings.update');
 
-    // 7. CLIENT PORTAL
+    // 8. CLIENT PORTAL
     Route::middleware(['auth'])->prefix('portal')->group(function () {
         Route::get('/', function() {
             return view('client.dashboard');

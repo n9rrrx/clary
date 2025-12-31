@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Activity;
 use App\Models\Task;
 use App\Models\Invoice;
+use App\Models\Project;
 use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
@@ -38,6 +39,24 @@ class DashboardController extends Controller
         // =========================================================
         // 2. AGENCY / ADMIN DASHBOARD LOGIC
         // =========================================================
+
+        $team = $user->currentTeam;
+        
+        // Get user's assigned projects if they're a member (not owner/admin)
+        $assignedProjects = collect();
+        if ($team && !$user->isOwnerOfCurrentTeam()) {
+            $membership = $user->teams()->where('team_id', $team->id)->first();
+            $role = $membership?->pivot?->role ?? 'member';
+            
+            // Members and viewers see their assigned projects
+            if (in_array($role, ['member', 'viewer'])) {
+                $assignedProjects = $user->projects()
+                    ->where('team_id', $team->id)
+                    ->with('client')
+                    ->orderBy('updated_at', 'desc')
+                    ->get();
+            }
+        }
 
         // Get the user's team IDs
         $teamIds = $user->teams()->pluck('teams.id')->toArray();
@@ -87,7 +106,7 @@ class DashboardController extends Controller
             })->with('project')->orderBy('due_date')->get();
         }
 
-        return view('dashboard', compact('updates', 'selectedClient', 'feed', 'clientTasks', 'tab'));
+        return view('dashboard', compact('updates', 'selectedClient', 'feed', 'clientTasks', 'tab', 'assignedProjects', 'team'));
     }
 
     public function storeActivity(Request $request)

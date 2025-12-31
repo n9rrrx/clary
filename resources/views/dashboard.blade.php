@@ -185,9 +185,105 @@
                     </div>
                 </div>
             @else
-                <div class="flex-1 flex items-center justify-center text-gray-500">
-                    Select a client to view activity.
-                </div>
+                {{-- Show assigned projects for members --}}
+                @if(isset($assignedProjects) && $assignedProjects->count() > 0)
+                    <div class="flex-1 overflow-y-auto p-8">
+                        <div class="max-w-5xl mx-auto">
+                            <div class="mb-6">
+                                <h2 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">My Assigned Projects</h2>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Projects you're assigned to work on</p>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                @foreach($assignedProjects as $project)
+                                    <a href="{{ route('projects.show', $project->id) }}" 
+                                       class="block bg-white dark:bg-midnight-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 p-6 hover:shadow-lg hover:border-blue-300 dark:hover:border-blue-700 transition-all group">
+                                        <div class="flex items-start justify-between mb-4">
+                                            <div class="flex-1">
+                                                <h3 class="font-bold text-lg text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-2">
+                                                    {{ $project->name }}
+                                                </h3>
+                                                @php
+                                                    $statusColors = [
+                                                        'planning' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+                                                        'in_progress' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+                                                        'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+                                                        'on_hold' => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+                                                        'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+                                                    ];
+                                                    $statusColor = $statusColors[$project->status] ?? 'bg-gray-100 text-gray-800';
+                                                @endphp
+                                                <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full {{ $statusColor }}">
+                                                    {{ ucwords(str_replace('_', ' ', $project->status)) }}
+                                                </span>
+                                            </div>
+                                        </div>
+
+                                        @if($project->description)
+                                            <p class="text-sm text-gray-600 dark:text-gray-400 mb-4 line-clamp-2">
+                                                {{ $project->description }}
+                                            </p>
+                                        @endif
+
+                                        <div class="space-y-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                            @if($project->budget)
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-gray-500 dark:text-gray-400">Budget</span>
+                                                    <span class="font-bold text-green-600 dark:text-green-400">
+                                                        ${{ number_format($project->budget, 2) }}
+                                                    </span>
+                                                </div>
+                                            @endif
+
+                                            @if($project->start_date)
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-gray-500 dark:text-gray-400">Start Date</span>
+                                                    <span class="font-medium text-gray-900 dark:text-white">
+                                                        {{ $project->start_date->format('M d, Y') }}
+                                                    </span>
+                                                </div>
+                                            @endif
+
+                                            @if($project->end_date)
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-gray-500 dark:text-gray-400">End Date</span>
+                                                    <span class="font-medium text-gray-900 dark:text-white">
+                                                        {{ $project->end_date->format('M d, Y') }}
+                                                    </span>
+                                                </div>
+                                            @endif
+
+                                            @if($project->client)
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-gray-500 dark:text-gray-400">Client</span>
+                                                    <span class="font-medium text-gray-900 dark:text-white">
+                                                        {{ $project->client->name }}
+                                                    </span>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                            <span class="text-blue-600 dark:text-blue-400 text-sm font-medium group-hover:underline">
+                                                View Project Details →
+                                            </span>
+                                        </div>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                @else
+                    <div class="flex-1 flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                            </svg>
+                            <p class="text-gray-500 dark:text-gray-400 mb-2">No projects assigned yet</p>
+                            <p class="text-sm text-gray-400 dark:text-gray-500">Contact your team admin to get assigned to projects.</p>
+                        </div>
+                    </div>
+                @endif
             @endif
         </main>
 

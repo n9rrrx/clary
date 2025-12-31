@@ -13,7 +13,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="font-sans text-gray-900 antialiased">
-<div class="min-h-screen flex flex-col sm:justify-center items-center pt-6 sm:pt-0 bg-gray-50 dark:bg-midnight-900 selection:bg-accent-500 selection:text-white">
+<div class="min-h-screen flex flex-col sm:justify-center items-center pt-16 sm:pt-12 pb-8 bg-gray-50 dark:bg-midnight-900 selection:bg-accent-500 selection:text-white">
 
     <div class="mb-6 text-center">
         <a href="/" class="flex flex-col items-center gap-2 group">
@@ -32,5 +32,6 @@
         &copy; {{ date('Y') }} Clary. All rights reserved.
     </div>
 </div>
+@stack('scripts')
 </body>
 </html>

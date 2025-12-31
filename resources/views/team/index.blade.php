@@ -141,14 +141,61 @@
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role & Permissions</label>
                         <select name="role" required
                                 class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-midnight-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-                            <option value="member">Member - Can work on assigned projects & tasks</option>
-                            <option value="admin">Admin - Can create projects and assign tasks</option>
-                            <option value="viewer">Viewer - Read-only access</option>
+                            <option value="admin">
+                                Admin - Full access: Create projects, assign tasks, manage team members, view all projects & invoices
+                            </option>
+                            <option value="member">
+                                Member - Work on assigned projects & tasks: View assigned projects (budget, dates, status), complete tasks, update task status
+                            </option>
+                            <option value="viewer">
+                                Viewer - Read-only access: View assigned projects & tasks, cannot edit or create
+                            </option>
                         </select>
+                        <div class="mt-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                            <p class="text-xs font-medium text-blue-900 dark:text-blue-200 mb-1">Selected Role Access:</p>
+                            <ul class="text-xs text-blue-800 dark:text-blue-300 space-y-1" id="roleDescription">
+                                <li id="admin-desc" class="hidden">• Create & manage projects</li>
+                                <li id="admin-desc-2" class="hidden">• Assign tasks to team members</li>
+                                <li id="admin-desc-3" class="hidden">• View all projects & invoices</li>
+                                <li id="admin-desc-4" class="hidden">• Manage team members</li>
+                                <li id="member-desc" class="hidden">• View assigned projects (budget, dates, status)</li>
+                                <li id="member-desc-2" class="hidden">• Work on assigned tasks</li>
+                                <li id="member-desc-3" class="hidden">• Update task status & progress</li>
+                                <li id="member-desc-4" class="hidden">• View project details</li>
+                                <li id="viewer-desc" class="hidden">• View assigned projects (read-only)</li>
+                                <li id="viewer-desc-2" class="hidden">• View tasks (cannot edit)</li>
+                                <li id="viewer-desc-3" class="hidden">• No creation or editing permissions</li>
+                            </ul>
+                        </div>
                     </div>
+                    
+                    <script>
+                        document.querySelector('select[name="role"]').addEventListener('change', function() {
+                            // Hide all descriptions
+                            document.querySelectorAll('[id$="-desc"], [id$="-desc-2"], [id$="-desc-3"], [id$="-desc-4"]').forEach(el => el.classList.add('hidden'));
+                            
+                            // Show selected role descriptions
+                            const role = this.value;
+                            if (role === 'admin') {
+                                ['admin-desc', 'admin-desc-2', 'admin-desc-3', 'admin-desc-4'].forEach(id => {
+                                    document.getElementById(id).classList.remove('hidden');
+                                });
+                            } else if (role === 'member') {
+                                ['member-desc', 'member-desc-2', 'member-desc-3', 'member-desc-4'].forEach(id => {
+                                    document.getElementById(id).classList.remove('hidden');
+                                });
+                            } else if (role === 'viewer') {
+                                ['viewer-desc', 'viewer-desc-2', 'viewer-desc-3'].forEach(id => {
+                                    document.getElementById(id).classList.remove('hidden');
+                                });
+                            }
+                        });
+                        // Trigger on page load to show default
+                        document.querySelector('select[name="role"]').dispatchEvent(new Event('change'));
+                    </script>
 
                     @if(isset($projects) && $projects->count() > 0)
                     <div>

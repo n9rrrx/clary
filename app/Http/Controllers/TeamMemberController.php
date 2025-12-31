@@ -74,12 +74,28 @@ class TeamMemberController extends Controller
             ]);
 
             // Optionally assign to project if provided
+            $assignedProject = null;
             if ($request->project_id) {
-                $project = Project::findOrFail($request->project_id);
+                $project = Project::with('client')->findOrFail($request->project_id);
                 // Verify project belongs to the team
                 if ($project->team_id === $team->id && !$project->members()->where('user_id', $existingUser->id)->exists()) {
                     $project->members()->attach($existingUser->id);
+                    $assignedProject = $project;
                 }
+            }
+
+            // Send notification email for existing user too
+            try {
+                Mail::to($email)->send(new TeamInvitation(
+                    $existingUser,
+                    'Your existing password', // They already have a password
+                    $team->name,
+                    0,
+                    ucfirst($request->role),
+                    $assignedProject
+                ));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send team invitation email: ' . $e->getMessage());
             }
 
             return redirect()->back()->with('success', 'Existing user added to your team' . ($request->project_id ? ' and assigned to project' : '') . '.');
@@ -102,11 +118,13 @@ class TeamMemberController extends Controller
         ]);
 
         // Optionally assign to project if provided
+        $assignedProject = null;
         if ($request->project_id) {
-            $project = Project::findOrFail($request->project_id);
+            $project = Project::with('client')->findOrFail($request->project_id);
             // Verify project belongs to the team
             if ($project->team_id === $team->id) {
                 $project->members()->attach($newUser->id);
+                $assignedProject = $project;
             }
         }
 
@@ -117,7 +135,8 @@ class TeamMemberController extends Controller
                 $tempPassword,
                 $team->name,
                 0, // No budget in Atlassian model
-                $request->role
+                ucfirst($request->role),
+                $assignedProject
             ));
         } catch (\Exception $e) {
             \Log::error('Failed to send team invitation email: ' . $e->getMessage());
