@@ -110,16 +110,16 @@
             background: white;
             border-radius: 12px;
             box-shadow:
-                0 0 0 1px rgba(0,0,0,0.08),
-                0 20px 50px rgba(0,0,0,0.15),
-                0 8px 16px rgba(0,0,0,0.12);
+                0 0 0 1px rgba(74, 144, 226, 0.15),
+                0 20px 50px rgba(74, 144, 226, 0.15),
+                0 8px 16px rgba(74, 144, 226, 0.12);
             overflow: hidden;
         }
 
         .dark .mockup-window {
-            background: #1a1a2e;
+            background: #152238;
             box-shadow:
-                0 0 0 1px rgba(255,255,255,0.1),
+                0 0 0 1px rgba(74, 144, 226, 0.2),
                 0 20px 50px rgba(0,0,0,0.5),
                 0 8px 16px rgba(0,0,0,0.3);
         }
@@ -135,8 +135,8 @@
         }
 
         .dark .mockup-header {
-            background: linear-gradient(180deg, #2a2a3e 0%, #1f1f2e 100%);
-            border-bottom: 1px solid #333348;
+            background: linear-gradient(180deg, #1a2744 0%, #152238 100%);
+            border-bottom: 1px solid #1e3a5f;
         }
 
         .mockup-dot {
@@ -167,8 +167,8 @@
         }
 
         .dark .task-card {
-            background: #16213e;
-            border: 1px solid #2d3748;
+            background: #1a2744;
+            border: 1px solid #1e3a5f;
         }
 
         .task-card:hover {
@@ -243,7 +243,7 @@
         }
 
         .dark .budget-bar {
-            background: #2d3748;
+            background: #1e3a5f;
         }
 
         .budget-fill {
@@ -262,7 +262,7 @@
         }
 
         .dark .budget-item {
-            border-bottom: 1px solid #2d3748;
+            border-bottom: 1px solid #1e3a5f;
         }
 
         .budget-item:last-child {
@@ -288,8 +288,8 @@
         }
 
         .dark .bento-item {
-            background: #1a1a2e;
-            border: 1px solid #2d3748;
+            background: #152238;
+            border: 1px solid #1e3a5f;
         }
 
         .bento-item:hover {
@@ -375,13 +375,13 @@
         }
     </style>
 </head>
-<body class="bg-[#FAFBFC] dark:bg-[#0f0f1e] text-gray-900 dark:text-gray-100 antialiased overflow-x-hidden transition-colors duration-300">
+<body class="bg-[#E8F4FD] dark:bg-gradient-to-b dark:from-[#0f1628] dark:to-[#1a2744] text-gray-900 dark:text-gray-100 antialiased overflow-x-hidden transition-colors duration-300">
 
 <!-- Noise Texture -->
 <div class="noise-overlay"></div>
 
 <!-- Navigation -->
-<nav class="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0f0f1e]/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50">
+<nav class="fixed top-0 left-0 right-0 z-50 bg-[#E8F4FD]/90 dark:bg-[#0f1628]/90 backdrop-blur-xl border-b border-blue-200/50 dark:border-blue-900/50">
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
@@ -398,7 +398,7 @@
             </div>
 
             <div class="flex items-center gap-4">
-                <button id="themeToggle" class="p-2.5 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all">
+                <button id="themeToggle" class="p-2.5 rounded-xl bg-blue-100/50 dark:bg-[#1a2744] border border-blue-200/60 dark:border-blue-800/50 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all">
                     <svg id="themeIcon" class="w-5 h-5 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
                 </button>
 
@@ -424,142 +424,198 @@
 </nav>
 
 <!-- Hero Section -->
-<section class="relative pt-32 pb-24 px-6 overflow-hidden">
-    <!-- Gradient Orbs Background -->
-    <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/20 dark:bg-blue-500/10 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 dark:bg-purple-500/10 rounded-full blur-3xl"></div>
+<section class="relative pt-28 pb-16 lg:pt-36 lg:pb-24 px-6 overflow-hidden min-h-[90vh] flex items-center">
+    <!-- Background Elements -->
+    <div class="absolute inset-0 overflow-hidden">
+        <!-- Large gradient orbs -->
+        <div class="absolute -top-40 -left-40 w-[600px] h-[600px] bg-gradient-to-br from-blue-400/40 to-cyan-300/30 dark:from-blue-600/20 dark:to-cyan-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 -right-40 w-[500px] h-[500px] bg-gradient-to-bl from-purple-400/30 to-blue-400/20 dark:from-purple-600/15 dark:to-blue-500/10 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 left-1/3 w-[400px] h-[400px] bg-gradient-to-tr from-blue-300/30 to-indigo-400/20 dark:from-blue-700/15 dark:to-indigo-600/10 rounded-full blur-3xl"></div>
 
-    <div class="max-w-7xl mx-auto text-center relative z-10">
+        <!-- Subtle grid pattern -->
+        <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect fill=%22none%22 stroke=%22%230066FF%22 stroke-width=%220.5%22 width=%2240%22 height=%2240%22/></svg>');"></div>
+    </div>
 
+    <div class="max-w-7xl mx-auto relative z-10 w-full">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
 
-        <!-- Main Heading -->
-        <h1 class="text-6xl md:text-7xl lg:text-8xl font-extrabold mb-8 tracking-tight animate-fade-in-up" style="animation-delay: 0.1s; font-family: 'Bricolage Grotesque', sans-serif;">
-            Project management<br/>
-            with <span class="gradient-text">crystal clarity</span>
-        </h1>
+            <!-- Left Content -->
+            <div class="text-left animate-fade-in-up">
+                <!-- Badge -->
+                <div class="inline-flex items-center gap-2 pl-3 pr-1 py-1 border-l-2 border-[#0066FF] text-sm font-medium text-[#0066FF] dark:text-blue-400 mb-6 uppercase tracking-wider">
+                    <span>Agency Project Management</span>
+                </div>
 
-        <p class="text-xl md:text-2xl text-gray-600 dark:text-gray-400 max-w-4xl mx-auto mb-12 leading-relaxed animate-fade-in-up" style="animation-delay: 0.2s;">
-            Stop drowning in spreadsheets and scattered tools. Clary brings everything your agency needs into one beautiful, intuitive workspace. See projects clearly, collaborate seamlessly, deliver faster.
-        </p>
+                <!-- Main Heading -->
+                <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 tracking-tight leading-[1.1]" style="font-family: 'Bricolage Grotesque', sans-serif;">
+                    <span class="text-gray-900 dark:text-white">Manage Projects</span><br/>
+                    <span class="gradient-text">With Clarity</span>
+                    <span class="gradient-text">By Using Clary</span>
+                </h1>
 
-        <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16 animate-fade-in-up" style="animation-delay: 0.3s;">
-            @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="group px-8 py-4 bg-gradient-to-r from-[#0066FF] to-[#6B4CE6] text-white text-lg font-bold rounded-xl hover:shadow-2xl hover:shadow-blue-500/40 transition-all hover:-translate-y-1 flex items-center gap-2">
-                    Start Free Trial
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </a>
-            @endif
-            <a href="#demo" class="px-8 py-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-lg font-bold rounded-xl border-2 border-gray-300 dark:border-gray-700 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1 hover:shadow-xl">
-                Watch Demo
-            </a>
-        </div>
+                <p class="text-lg md:text-xl text-gray-600 dark:text-gray-400 max-w-xl mb-8 leading-relaxed">
+                    The all-in-one workspace for agencies who want to deliver projects on time, on budget, and stress-free. See everything clearly.
+                </p>
 
-        <!-- Trust Indicators -->
-        <div class="flex flex-wrap items-center justify-center gap-8 text-sm text-gray-500 dark:text-gray-500 animate-fade-in-up" style="animation-delay: 0.4s;">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>14-day free trial</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>No credit card required</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>Cancel anytime</span>
-            </div>
-        </div>
+                <!-- CTA Button -->
+                <div class="flex flex-col sm:flex-row items-start gap-4 mb-8">
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="group px-8 py-4 bg-gradient-to-r from-[#0066FF] to-[#4F46E5] text-white text-lg font-bold rounded-full hover:shadow-2xl hover:shadow-blue-500/40 transition-all hover:-translate-y-1 flex items-center gap-3">
+                            Start a Project
+                            <span class="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 transition-colors">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                            </span>
+                        </a>
+                    @endif
+                </div>
 
-        <!-- Hero Dashboard Preview -->
-        <div class="mt-20 relative animate-fade-in-up" style="animation-delay: 0.5s;">
-            <div class="absolute -inset-4 bg-gradient-to-r from-[#0066FF]/20 via-[#6B4CE6]/20 to-[#0066FF]/20 rounded-3xl blur-2xl"></div>
-            <div class="relative mockup-window max-w-5xl mx-auto">
-                <div class="mockup-header">
-                    <div class="mockup-dot red"></div>
-                    <div class="mockup-dot yellow"></div>
-                    <div class="mockup-dot green"></div>
-                    <div class="flex-1 flex justify-center">
-                        <div class="bg-gray-200 dark:bg-gray-700 rounded-md px-4 py-1 text-xs text-gray-500 dark:text-gray-400">app.clary.io/dashboard</div>
+                <!-- Trust Indicators -->
+                <div class="flex flex-wrap items-center gap-6 text-sm text-gray-500 dark:text-gray-400">
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>14-day free trial</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>No credit card</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <span>Cancel anytime</span>
                     </div>
                 </div>
-                <div class="mockup-content bg-gray-50 dark:bg-[#0f0f1e] p-6">
-                    <!-- Dashboard Header -->
-                    <div class="flex items-center justify-between mb-6">
+            </div>
+
+            <!-- Right Visual Area -->
+            <div class="relative lg:h-[550px] flex items-center justify-center">
+
+                <!-- Central Dashboard Preview -->
+                <div class="relative z-10 w-full max-w-md transform lg:rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <div class="bg-white dark:bg-[#152238] rounded-2xl shadow-2xl shadow-blue-500/20 dark:shadow-blue-900/40 border border-blue-100 dark:border-blue-800/50 overflow-hidden">
+                        <!-- Mini Header -->
+                        <div class="bg-gradient-to-r from-[#0066FF] to-[#4F46E5] px-4 py-3 flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-white/30"></div>
+                            <div class="w-3 h-3 rounded-full bg-white/30"></div>
+                            <div class="w-3 h-3 rounded-full bg-white/30"></div>
+                            <span class="ml-2 text-white/80 text-xs font-medium">Clary Dashboard</span>
+                        </div>
+                        <!-- Content -->
+                        <div class="p-5">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <div class="text-sm font-bold text-gray-900 dark:text-white">Active Projects</div>
+                                    <div class="text-2xl font-extrabold text-[#0066FF]">12</div>
+                                </div>
+                                <div class="w-12 h-12 bg-gradient-to-br from-green-400 to-emerald-500 rounded-xl flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                                </div>
+                            </div>
+                            <!-- Progress bars -->
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-600 dark:text-gray-400">Brand Redesign</span>
+                                        <span class="text-green-500 font-medium">85%</span>
+                                    </div>
+                                    <div class="h-2 bg-gray-100 dark:bg-blue-900/30 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full" style="width: 85%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-600 dark:text-gray-400">Website Launch</span>
+                                        <span class="text-blue-500 font-medium">62%</span>
+                                    </div>
+                                    <div class="h-2 bg-gray-100 dark:bg-blue-900/30 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-blue-400 to-indigo-500 rounded-full" style="width: 62%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between text-xs mb-1">
+                                        <span class="text-gray-600 dark:text-gray-400">Mobile App</span>
+                                        <span class="text-purple-500 font-medium">45%</span>
+                                    </div>
+                                    <div class="h-2 bg-gray-100 dark:bg-blue-900/30 rounded-full overflow-hidden">
+                                        <div class="h-full bg-gradient-to-r from-purple-400 to-pink-500 rounded-full" style="width: 45%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Floating Icon Cards -->
+                <!-- Task Card - Top Left -->
+                <div class="absolute top-0 left-0 lg:-left-8 bg-white dark:bg-[#1a2744] p-4 rounded-2xl shadow-xl shadow-blue-500/10 border border-blue-100 dark:border-blue-800/50 animate-float z-20">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-orange-400 to-red-500 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                        </div>
                         <div>
-                            <h3 class="text-lg font-bold text-gray-900 dark:text-white">Good morning, Sarah! 👋</h3>
-                            <p class="text-sm text-gray-500 dark:text-gray-400">You have 5 tasks due today</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500"></div>
-                        </div>
-                    </div>
-                    <!-- Dashboard Stats -->
-                    <div class="grid grid-cols-4 gap-4 mb-6">
-                        <div class="bg-white dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                            <div class="text-2xl font-bold text-gray-900 dark:text-white">12</div>
-                            <div class="text-xs text-gray-500">Active Projects</div>
-                        </div>
-                        <div class="bg-white dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                            <div class="text-2xl font-bold text-green-500">87%</div>
-                            <div class="text-xs text-gray-500">On Track</div>
-                        </div>
-                        <div class="bg-white dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                            <div class="text-2xl font-bold text-[#0066FF]">$127K</div>
-                            <div class="text-xs text-gray-500">Revenue MTD</div>
-                        </div>
-                        <div class="bg-white dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                            <div class="text-2xl font-bold text-[#6B4CE6]">24</div>
-                            <div class="text-xs text-gray-500">Team Members</div>
-                        </div>
-                    </div>
-                    <!-- Dashboard Projects -->
-                    <div class="grid grid-cols-3 gap-4">
-                        <div class="col-span-2 bg-white dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                            <div class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Recent Projects</div>
-                            <div class="space-y-2">
-                                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-[#0f0f1e] rounded-lg">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                        <span class="text-sm text-gray-700 dark:text-gray-300">Brand Redesign - Acme Co</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">75%</span>
-                                </div>
-                                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-[#0f0f1e] rounded-lg">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
-                                        <span class="text-sm text-gray-700 dark:text-gray-300">Website Launch - TechStart</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">45%</span>
-                                </div>
-                                <div class="flex items-center justify-between p-2 bg-gray-50 dark:bg-[#0f0f1e] rounded-lg">
-                                    <div class="flex items-center gap-3">
-                                        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
-                                        <span class="text-sm text-gray-700 dark:text-gray-300">Mobile App - FinanceHub</span>
-                                    </div>
-                                    <span class="text-xs text-gray-500">90%</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="bg-white dark:bg-[#1a1a2e] rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                            <div class="text-sm font-semibold text-gray-900 dark:text-white mb-3">Team Activity</div>
-                            <div class="flex -space-x-2 mb-3">
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 border-2 border-white dark:border-[#1a1a2e]"></div>
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 border-2 border-white dark:border-[#1a1a2e]"></div>
-                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 border-2 border-white dark:border-[#1a1a2e]"></div>
-                                <div class="w-8 h-8 rounded-full bg-gray-300 dark:bg-gray-600 border-2 border-white dark:border-[#1a1a2e] flex items-center justify-center text-xs font-bold text-gray-600 dark:text-gray-300">+5</div>
-                            </div>
-                            <p class="text-xs text-gray-500">8 members online now</p>
+                            <div class="text-xs font-bold text-gray-900 dark:text-white">Tasks Done</div>
+                            <div class="text-lg font-extrabold text-orange-500">247</div>
                         </div>
                     </div>
                 </div>
+
+                <!-- Team Card - Top Right -->
+                <div class="absolute top-8 right-0 lg:-right-4 bg-white dark:bg-[#1a2744] p-4 rounded-2xl shadow-xl shadow-blue-500/10 border border-blue-100 dark:border-blue-800/50 animate-float z-20" style="animation-delay: 1s;">
+                    <div class="flex items-center gap-3">
+                        <div class="flex -space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 border-2 border-white dark:border-[#1a2744]"></div>
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 border-2 border-white dark:border-[#1a2744]"></div>
+                            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 border-2 border-white dark:border-[#1a2744]"></div>
+                        </div>
+                        <div class="text-xs font-medium text-gray-600 dark:text-gray-400">+24 team</div>
+                    </div>
+                </div>
+
+                <!-- Budget Card - Bottom Left -->
+                <div class="absolute bottom-20 left-4 lg:-left-4 bg-white dark:bg-[#1a2744] p-4 rounded-2xl shadow-xl shadow-blue-500/10 border border-blue-100 dark:border-blue-800/50 animate-float z-20" style="animation-delay: 2s;">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-emerald-400 to-green-500 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold text-gray-900 dark:text-white">Revenue</div>
+                            <div class="text-lg font-extrabold text-emerald-500">$127K</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Card - Bottom Right -->
+                <div class="absolute bottom-4 right-8 lg:right-0 bg-white dark:bg-[#1a2744] p-3 rounded-2xl shadow-xl shadow-blue-500/10 border border-blue-100 dark:border-blue-800/50 animate-float z-20" style="animation-delay: 1.5s;">
+                    <div class="flex items-center gap-2">
+                        <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                            <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                        </div>
+                        <div class="text-xs">
+                            <div class="font-bold text-gray-900 dark:text-white">New update!</div>
+                            <div class="text-gray-500 dark:text-gray-400">Project delivered</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Decorative Elements -->
+                <!-- Star/Sparkle -->
+                <svg class="absolute top-16 right-1/4 w-6 h-6 text-yellow-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
+                </svg>
+                <svg class="absolute bottom-32 left-1/4 w-4 h-4 text-blue-400 animate-pulse" style="animation-delay: 0.5s;" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
+                </svg>
+
+                <!-- Circles -->
+                <div class="absolute top-1/4 right-8 w-3 h-3 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.3s;"></div>
+                <div class="absolute bottom-1/3 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 0.7s;"></div>
+                <div class="absolute top-1/2 right-1/3 w-4 h-4 border-2 border-blue-300 dark:border-blue-600 rounded-full animate-ping opacity-50"></div>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Trusted By Section -->
-<section class="py-16 px-6 border-y border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1a1a2e]">
+<section class="py-16 px-6 border-y border-blue-200/50 dark:border-blue-900/50 bg-white/50 dark:bg-[#0f1628]/50 backdrop-blur-sm">
     <div class="max-w-7xl mx-auto">
         <p class="text-center text-sm font-semibold text-gray-500 dark:text-gray-500 uppercase tracking-wider mb-12">
             Powering teams at world-class companies
@@ -574,7 +630,7 @@
 </section>
 
 <!-- Stats Section -->
-<section class="py-32 px-6 bg-gradient-to-b from-white to-blue-50/30 dark:from-[#0f0f1e] dark:to-blue-950/10">
+<section class="py-32 px-6 bg-gradient-to-b from-[#E8F4FD] to-[#D0E8FA] dark:from-[#0f1628] dark:to-[#152238]">
     <div class="max-w-7xl mx-auto">
         <div class="grid md:grid-cols-4 gap-12 text-center">
             <div class="scroll-reveal">
@@ -654,9 +710,8 @@
 
             <!-- Right: Content -->
             <div class="scroll-reveal order-1 lg:order-2">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-blue-50 dark:bg-blue-950/30 rounded-full text-sm font-semibold text-[#0066FF] mb-4">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-                    Task Management
+                <div class="inline-flex items-center gap-2 pl-3 pr-1 py-1 border-l-2 border-[#0066FF] text-sm font-medium text-[#0066FF] dark:text-blue-400 mb-4 uppercase tracking-wider">
+                    <span>Stay on top of tasks</span>
                 </div>
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style="font-family: 'Bricolage Grotesque', sans-serif;">
                     Tasks that don't get lost in <span class="gradient-text">invisible tabs</span>
@@ -693,14 +748,13 @@
 </section>
 
 <!-- Feature Deep Dive 2: Budget Tracking (Zig-Zag Right) -->
-<section class="py-32 px-6 bg-gradient-to-b from-white to-purple-50/20 dark:from-[#0f0f1e] dark:to-purple-950/10">
+<section class="py-32 px-6 bg-gradient-to-b from-[#D0E8FA] to-[#E8F4FD] dark:from-[#152238] dark:to-[#0f1628]">
     <div class="max-w-7xl mx-auto">
         <div class="grid lg:grid-cols-2 gap-16 items-center">
             <!-- Left: Content -->
             <div class="scroll-reveal">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-50 dark:bg-purple-950/30 rounded-full text-sm font-semibold text-[#6B4CE6] mb-4">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                    Budget Intelligence
+                <div class="inline-flex items-center gap-2 pl-3 pr-1 py-1 border-l-2 border-[#6B4CE6] text-sm font-medium text-[#6B4CE6] dark:text-purple-400 mb-4 uppercase tracking-wider">
+                    <span>Know where money goes</span>
                 </div>
                 <h2 class="text-4xl md:text-5xl font-bold mb-6 tracking-tight" style="font-family: 'Bricolage Grotesque', sans-serif;">
                     <span class="gradient-text">Budget logic</span> that actually makes sense
@@ -877,14 +931,14 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-4 gap-4 mt-8">
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Slack</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Drive</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Figma</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">GitHub</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Notion</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Asana</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Zapier</div>
-                    <div class="aspect-square bg-gray-100 dark:bg-gray-800 rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">+50</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Slack</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Drive</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Figma</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">GitHub</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Notion</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Asana</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Zapier</div>
+                    <div class="aspect-square bg-blue-100/50 dark:bg-[#1a2744] rounded-xl flex items-center justify-center font-bold text-gray-400 dark:text-gray-600 text-xs hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">+50</div>
                 </div>
             </div>
 
@@ -914,12 +968,11 @@
 </section>
 
 <!-- How It Works Section -->
-<section id="how-it-works" class="py-32 px-6 bg-gradient-to-b from-gray-50 to-white dark:from-[#1a1a2e] dark:to-[#0f0f1e]">
+<section id="how-it-works" class="py-32 px-6 bg-gradient-to-b from-[#D0E8FA] to-[#E8F4FD] dark:from-[#152238] dark:to-[#0f1628]">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-20 scroll-reveal">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-green-50 dark:bg-green-950/30 rounded-full text-sm font-semibold text-green-600 dark:text-green-400 mb-4">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                Quick Setup
+            <div class="inline-flex items-center gap-2 pl-3 pr-1 py-1 border-l-2 border-green-500 text-sm font-medium text-green-600 dark:text-green-400 mb-4 uppercase tracking-wider">
+                <span>Get started fast</span>
             </div>
             <h2 class="text-4xl md:text-5xl font-bold mb-6" style="font-family: 'Bricolage Grotesque', sans-serif;">
                 Up and running in <span class="gradient-text">minutes, not days</span>
@@ -970,14 +1023,13 @@
 </section>
 
 <!-- Pricing Section -->
-<section id="pricing" class="py-32 px-6">
+<section id="pricing" class="py-32 px-6 bg-[#D0E8FA] dark:bg-[#0f1628] transition-colors duration-300">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16 scroll-reveal">
-            <div class="inline-flex items-center gap-2 px-4 py-2 bg-amber-50 dark:bg-amber-950/30 rounded-full text-sm font-semibold text-amber-600 dark:text-amber-400 mb-4">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Simple Pricing
+            <div class="inline-flex items-center gap-2 pl-3 pr-1 py-1 border-l-2 border-amber-500 text-sm font-medium text-amber-600 dark:text-amber-400 mb-4 uppercase tracking-wider">
+                <span>No surprises</span>
             </div>
-            <h2 class="text-4xl md:text-5xl font-bold mb-6" style="font-family: 'Bricolage Grotesque', sans-serif;">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white" style="font-family: 'Bricolage Grotesque', sans-serif;">
                 Plans that <span class="gradient-text">scale with you</span>
             </h2>
             <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
@@ -985,9 +1037,17 @@
             </p>
         </div>
 
-        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-            <!-- Starter Plan -->
-            <div class="scroll-reveal bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-gray-800 rounded-3xl p-8 hover:border-gray-300 dark:hover:border-gray-700 transition-all hover:-translate-y-1">
+        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto group/plans perspective-1000">
+
+            <div class="scroll-reveal relative bg-white dark:bg-[#152238] border border-blue-200/60 dark:border-blue-900/50 rounded-3xl p-8
+                        transform transition-all duration-500 ease-out
+                        /* Default State */
+                        opacity-100 scale-100 translate-y-0
+                        /* When neighbor is hovered (Recede) */
+                        group-hover/plans:opacity-60 group-hover/plans:scale-95 group-hover/plans:blur-[1px]
+                        /* When THIS is hovered (Focus) */
+                        hover:!opacity-100 hover:!scale-105 hover:!-translate-y-4 hover:!blur-0 hover:shadow-2xl hover:border-blue-400 dark:hover:border-blue-500 hover:z-10">
+
                 <div class="mb-6">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" style="font-family: 'Bricolage Grotesque', sans-serif;">Starter</h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm">Perfect for freelancers</p>
@@ -1009,18 +1069,21 @@
                         <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Basic analytics
                     </li>
-                    <li class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-                        <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Email support
-                    </li>
                 </ul>
-                <a href="{{ Route::has('register') ? route('register') : '#' }}" class="block w-full py-3 px-6 text-center font-semibold rounded-xl border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#0066FF] dark:hover:border-blue-500 hover:text-[#0066FF] dark:hover:text-blue-400 transition-all">
+                <a href="{{ route('register.plan', ['plan' => 'free']) }}" class="block w-full py-3 px-6 text-center font-semibold rounded-xl border-2 border-blue-200/60 dark:border-blue-800/50 text-gray-700 dark:text-gray-300 hover:bg-blue-50 hover:border-blue-500 hover:text-blue-600 transition-colors">
                     Get Started Free
                 </a>
             </div>
 
-            <!-- Pro Plan (Popular) -->
-            <div class="scroll-reveal relative bg-gradient-to-b from-[#0066FF] to-[#6B4CE6] rounded-3xl p-8 text-white transform md:scale-105 shadow-2xl shadow-blue-500/30" style="transition-delay: 0.1s;">
+            <div class="scroll-reveal relative bg-gradient-to-b from-[#0066FF] to-[#6B4CE6] rounded-3xl p-8 text-white shadow-2xl shadow-blue-500/30
+                        transform transition-all duration-500 ease-out z-10
+                        /* Default State (Already lifted) */
+                        md:-translate-y-4 opacity-100 scale-100
+                        /* When neighbor is hovered (Recede & Reset Lift) */
+                        group-hover/plans:opacity-60 group-hover/plans:scale-95 group-hover/plans:translate-y-0 group-hover/plans:blur-[1px]
+                        /* When THIS is hovered (Super Focus) */
+                        hover:!opacity-100 hover:!scale-110 hover:!md:-translate-y-6 hover:!blur-0 hover:shadow-blue-500/60 hover:z-20" style="transition-delay: 0.1s;">
+
                 <div class="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full text-xs font-bold text-white shadow-lg">
                     MOST POPULAR
                 </div>
@@ -1034,33 +1097,32 @@
                 </div>
                 <ul class="space-y-4 mb-8">
                     <li class="flex items-center gap-3">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <svg class="w-5 h-5 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Unlimited projects
                     </li>
                     <li class="flex items-center gap-3">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        <svg class="w-5 h-5 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Unlimited team members
                     </li>
                     <li class="flex items-center gap-3">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Advanced analytics & reports
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Budget tracking
-                    </li>
-                    <li class="flex items-center gap-3">
-                        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Priority support
+                        <svg class="w-5 h-5 flex-shrink-0 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                        Advanced analytics
                     </li>
                 </ul>
-                <a href="{{ Route::has('register') ? route('register') : '#' }}" class="block w-full py-3 px-6 text-center font-semibold rounded-xl bg-white text-[#0066FF] hover:bg-gray-100 transition-all shadow-lg">
+                <a href="{{ route('register.plan', ['plan' => 'pro']) }}" class="block w-full py-3 px-6 text-center font-semibold rounded-xl bg-white text-[#0066FF] hover:bg-blue-100/50 transition-all shadow-lg">
                     Start Free Trial
                 </a>
             </div>
 
-            <!-- Enterprise Plan -->
-            <div class="scroll-reveal bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-gray-800 rounded-3xl p-8 hover:border-gray-300 dark:hover:border-gray-700 transition-all hover:-translate-y-1" style="transition-delay: 0.2s;">
+            <div class="scroll-reveal relative bg-white dark:bg-[#152238] border border-blue-200/60 dark:border-blue-900/50 rounded-3xl p-8
+                        transform transition-all duration-500 ease-out
+                        /* Default State */
+                        opacity-100 scale-100 translate-y-0
+                        /* When neighbor is hovered (Recede) */
+                        group-hover/plans:opacity-60 group-hover/plans:scale-95 group-hover/plans:blur-[1px]
+                        /* When THIS is hovered (Focus) */
+                        hover:!opacity-100 hover:!scale-105 hover:!-translate-y-4 hover:!blur-0 hover:shadow-2xl hover:border-purple-400 dark:hover:border-purple-500 hover:z-10" style="transition-delay: 0.2s;">
+
                 <div class="mb-6">
                     <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-2" style="font-family: 'Bricolage Grotesque', sans-serif;">Enterprise</h3>
                     <p class="text-gray-500 dark:text-gray-400 text-sm">For large organizations</p>
@@ -1079,27 +1141,18 @@
                     </li>
                     <li class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
                         <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        Custom integrations
-                    </li>
-                    <li class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-                        <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         Dedicated account manager
                     </li>
-                    <li class="flex items-center gap-3 text-gray-600 dark:text-gray-400">
-                        <svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                        SLA guarantee
-                    </li>
                 </ul>
-                <a href="#" class="block w-full py-3 px-6 text-center font-semibold rounded-xl border-2 border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-[#0066FF] dark:hover:border-blue-500 hover:text-[#0066FF] dark:hover:text-blue-400 transition-all">
+                <a href="#" class="block w-full py-3 px-6 text-center font-semibold rounded-xl border-2 border-blue-200/60 dark:border-blue-800/50 text-gray-700 dark:text-gray-300 hover:bg-purple-50 hover:border-purple-500 hover:text-purple-600 dark:hover:bg-purple-900/20 dark:hover:text-purple-300 transition-colors">
                     Contact Sales
                 </a>
             </div>
         </div>
     </div>
 </section>
-
 <!-- Testimonials -->
-<section class="py-32 px-6 bg-gradient-to-b from-white to-gray-50 dark:from-[#0f0f1e] dark:to-[#1a1a2e]">
+<section class="py-32 px-6 bg-gradient-to-b from-[#E8F4FD] to-[#D0E8FA] dark:from-[#0f1628] dark:to-[#152238]">
     <div class="max-w-7xl mx-auto">
         <div class="text-center mb-16 scroll-reveal">
             <h2 class="text-4xl md:text-5xl font-bold mb-6" style="font-family: 'Bricolage Grotesque', sans-serif;">
@@ -1109,7 +1162,7 @@
         </div>
 
         <div class="grid md:grid-cols-3 gap-8">
-            <div class="scroll-reveal bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1">
+            <div class="scroll-reveal bg-white dark:bg-[#152238] border border-blue-200/60 dark:border-blue-900/50 rounded-2xl p-8 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1">
                 <div class="flex items-center gap-1 mb-4">
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
@@ -1131,7 +1184,7 @@
                 </div>
             </div>
 
-            <div class="scroll-reveal bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1" style="transition-delay: 0.1s;">
+            <div class="scroll-reveal bg-white dark:bg-[#152238] border border-blue-200/60 dark:border-blue-900/50 rounded-2xl p-8 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1" style="transition-delay: 0.1s;">
                 <div class="flex items-center gap-1 mb-4">
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
@@ -1153,7 +1206,7 @@
                 </div>
             </div>
 
-            <div class="scroll-reveal bg-white dark:bg-[#1a1a2e] border border-gray-200 dark:border-gray-800 rounded-2xl p-8 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1" style="transition-delay: 0.2s;">
+            <div class="scroll-reveal bg-white dark:bg-[#152238] border border-blue-200/60 dark:border-blue-900/50 rounded-2xl p-8 hover:border-[#0066FF] dark:hover:border-blue-500 transition-all hover:-translate-y-1" style="transition-delay: 0.2s;">
                 <div class="flex items-center gap-1 mb-4">
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
@@ -1162,7 +1215,7 @@
                     <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
                 </div>
                 <p class="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
-                    "Finally, a tool that doesn't require a PhD to use. Our whole team was onboarded in an afternoon. It just works."
+                    "Finally, a tool that doesn't require a PhD to use. Our whole team was onboarded in an afternoon. It just works. I am looking forward to use it more."
                 </p>
                 <div class="flex items-center gap-3">
                     <div class="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center text-white font-bold">
@@ -1179,52 +1232,100 @@
 </section>
 
 <!-- Final CTA -->
-<section class="py-32 px-6 relative overflow-hidden bg-gradient-to-br from-[#0066FF] via-[#6B4CE6] to-[#0066FF]">
-    <!-- Animated Background -->
-    <div class="absolute inset-0 opacity-20">
-        <div class="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-float"></div>
-        <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-float" style="animation-delay: 2s;"></div>
-    </div>
+<section class="py-24 px-6 relative overflow-hidden bg-[#4A90E2] dark:bg-gradient-to-br dark:from-blue-900 dark:to-slate-900 transition-colors duration-500">
+    <div class="absolute top-0 right-0 w-[500px] h-[500px] bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-5xl mx-auto text-center relative z-10 scroll-reveal">
-        <h2 class="text-5xl md:text-6xl lg:text-7xl font-extrabold text-white mb-8 tracking-tight" style="font-family: 'Bricolage Grotesque', sans-serif;">
-            Ready to see clearly?
-        </h2>
-        <p class="text-xl md:text-2xl text-blue-100 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Join 10,000+ agencies who've ditched the chaos for crystal-clear project management. Start your free 14-day trial—no credit card required.
-        </p>
+    <div class="max-w-7xl mx-auto relative z-10">
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-16">
 
-        <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-12">
-            @if (Route::has('register'))
-                <a href="{{ route('register') }}" class="group px-10 py-5 bg-white text-[#0066FF] text-xl font-bold rounded-xl hover:bg-gray-100 transition-all hover:shadow-2xl hover:-translate-y-1 flex items-center gap-2">
-                    Start Your Free Trial
-                    <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
-                </a>
-            @endif
-            <a href="#demo" class="px-10 py-5 bg-transparent border-2 border-white text-white text-xl font-bold rounded-xl hover:bg-white/10 transition-all hover:-translate-y-1">
-                Watch Demo
-            </a>
-        </div>
+            <div class="w-full lg:w-1/2 relative perspective-1000">
+                <div class="relative w-full max-w-[400px] mx-auto lg:mr-auto lg:ml-0">
 
-        <div class="flex flex-wrap items-center justify-center gap-8 text-sm text-blue-100">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>14-day free trial</span>
+                    <div class="bg-blue-300/30 backdrop-blur-sm border border-white/20 rounded-[3rem] p-4 h-[500px] w-full shadow-2xl relative overflow-hidden">
+                        <div class="bg-blue-200/50 dark:bg-blue-800/50 w-full h-full rounded-[2.5rem] relative overflow-hidden flex flex-col items-center pt-12">
+                            <div class="w-48 h-48 bg-gray-800 rounded-full flex items-center justify-center shadow-lg mb-6 group cursor-pointer hover:scale-105 transition-transform">
+                                <svg class="w-24 h-24 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z" /></svg>
+                            </div>
+                            <div class="w-32 h-4 bg-white/40 rounded-full mb-3"></div>
+                            <div class="flex gap-2">
+                                <div class="w-8 h-8 rounded-full bg-white/40"></div>
+                                <div class="w-8 h-8 rounded-full bg-white/40"></div>
+                                <div class="w-8 h-8 rounded-full bg-white/40"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute top-12 -right-4 md:-right-12 bg-white dark:bg-[#152238] p-4 rounded-2xl shadow-xl w-48 animate-float z-20 border border-gray-100 dark:border-blue-800/50">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase">Payment Method</span>
+                            <div class="flex -space-x-1">
+                                <div class="w-4 h-4 rounded-full bg-red-500 opacity-80"></div>
+                                <div class="w-4 h-4 rounded-full bg-yellow-500 opacity-80"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="flex items-center gap-2 p-2 bg-gray-50 dark:bg-[#1a2744]/50 rounded-lg">
+                                <div class="w-3 h-3 rounded-full bg-gray-900 dark:bg-white"></div>
+                                <div class="h-2 w-16 bg-gray-200 dark:bg-blue-800/50 rounded"></div>
+                            </div>
+                            <div class="flex items-center gap-2 p-2 rounded-lg opacity-50">
+                                <div class="w-3 h-3 rounded-full border border-gray-300"></div>
+                                <div class="h-2 w-12 bg-gray-200 dark:bg-blue-800/50 rounded"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute bottom-16 -left-4 md:-left-12 bg-white dark:bg-[#152238] p-5 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.2)] w-64 animate-float z-30 border border-gray-100 dark:border-blue-800/50" style="animation-delay: 2s;">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold text-gray-900 dark:text-white text-sm">Add New Card</h4>
+                            <span class="text-gray-400 cursor-pointer">×</span>
+                        </div>
+                        <div class="space-y-3">
+                            <div>
+                                <div class="text-[10px] text-gray-400 mb-1">Name on card</div>
+                                <div class="text-xs font-medium text-gray-900 dark:text-gray-200">n9rrrx</div>
+                            </div>
+                            <div>
+                                <div class="text-[10px] text-gray-400 mb-1">Card number</div>
+                                <div class="text-xs font-medium text-gray-900 dark:text-gray-200 tracking-wider">•••• •••• •••• 4242</div>
+                            </div>
+                            <button class="w-full py-2 bg-[#0066FF] hover:bg-blue-600 text-white text-xs font-bold rounded-lg transition-colors mt-2">
+                                Pay Now
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>No credit card needed</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <span>Cancel anytime</span>
+
+            <div class="w-full lg:w-1/2 text-left">
+                <h2 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 tracking-tight leading-[1.1]" style="font-family: 'Bricolage Grotesque', sans-serif;">
+                    Trusted Partner in<br>
+                    Payment Solutions
+                </h2>
+                <p class="text-lg md:text-xl text-blue-50 dark:text-blue-200 mb-10 leading-relaxed max-w-lg">
+                    An extensive network of partners, we help businesses accept and process payments in over 150 currencies globally!
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4">
+                    @if (Route::has('register'))
+                        <a href="{{ route('register') }}" class="group px-8 py-4 bg-white dark:bg-[#0f1628] text-[#0066FF] dark:text-blue-400 text-lg font-bold rounded-full hover:shadow-[0_0_30px_rgba(255,255,255,0.4)] transition-all transform hover:-translate-y-1 flex items-center gap-3">
+                            Start Now
+                            <span class="bg-blue-100 dark:bg-blue-900/50 p-1 rounded-full group-hover:translate-x-1 transition-transform">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </span>
+                        </a>
+                    @endif
+                    <a href="#demo" class="px-8 py-4 bg-blue-500/20 border border-white/30 text-white text-lg font-bold rounded-full hover:bg-white/10 hover:border-white transition-all backdrop-blur-sm">
+                        Book A Call
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </section>
-
 <!-- Footer -->
-<footer class="border-t border-gray-200 dark:border-gray-800 py-16 px-6 bg-white dark:bg-[#1a1a2e]">
+<footer class="border-t border-blue-200/60 dark:border-blue-900/50 py-16 px-6 bg-white dark:bg-[#152238]">
     <div class="max-w-7xl mx-auto">
         <div class="grid md:grid-cols-5 gap-12 mb-12">
             <div class="md:col-span-2">
@@ -1281,7 +1382,7 @@
             </div>
         </div>
 
-        <div class="border-t border-gray-200 dark:border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div class="border-t border-blue-200/50 dark:border-blue-900/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p class="text-gray-500 dark:text-gray-400 text-sm">
                 © 2025 Clary. All rights reserved.
             </p>

@@ -31,10 +31,17 @@ class ProjectController extends Controller
             $membership = $user->teams()->where('team_id', $team->id)->first();
             $role = $membership?->pivot?->role ?? 'member';
 
-            // Non-admins only see projects with assigned tasks
+            // Non-admins only see projects they're assigned to (either via project_user or tasks)
             if (!in_array($role, ['admin', 'owner']) && $team->owner_id !== $user->id) {
-                $query->whereHas('tasks', function ($q) use ($user) {
-                    $q->where('assigned_to_user_id', $user->id);
+                $query->where(function($q) use ($user) {
+                    // Projects directly assigned to user
+                    $q->whereHas('members', function($memberQuery) use ($user) {
+                        $memberQuery->where('user_id', $user->id);
+                    })
+                    // OR projects where user has assigned tasks
+                    ->orWhereHas('tasks', function ($taskQuery) use ($user) {
+                        $taskQuery->where('assigned_to_user_id', $user->id);
+                    });
                 });
             }
         }

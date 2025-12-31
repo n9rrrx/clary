@@ -20,8 +20,33 @@
     <p>You have been assigned to <strong>{{ $clientName }}</strong>. Below are your specific role and budget details as assigned by the administrator:</p>
 
     <div class="assignment-box">
-        <p style="margin: 0;"><strong>Assigned Role:</strong> <span class="highlight">{{ $assignedRole }}</span></p>
-        <p style="margin: 10px 0 0 0;"><strong>Allocated Budget:</strong> <span class="highlight">${{ number_format($budget, 2) }}</span></p>
+        <p style="margin: 0;"><strong>Assigned Role:</strong> <span class="highlight">{{ ucfirst($assignedRole) }}</span></p>
+
+        @if($assignedProject)
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid #dbeafe;">
+                <p style="margin: 0 0 10px 0; font-weight: 600; color: #1e40af;">Assigned Project:</p>
+                <p style="margin: 5px 0;"><strong>Project Name:</strong> <span class="highlight">{{ $assignedProject->name }}</span></p>
+                @if($assignedProject->budget)
+                    <p style="margin: 5px 0;"><strong>Project Budget:</strong> <span class="highlight">${{ number_format($assignedProject->budget, 2) }}</span></p>
+                @endif
+                @if($assignedProject->start_date)
+                    <p style="margin: 5px 0;"><strong>Start Date:</strong> {{ $assignedProject->start_date->format('M d, Y') }}</p>
+                @endif
+                @if($assignedProject->end_date)
+                    <p style="margin: 5px 0;"><strong>End Date:</strong> {{ $assignedProject->end_date->format('M d, Y') }}</p>
+                @endif
+                @php
+                    $statusLabels = [
+                        'planning' => 'Not Started',
+                        'in_progress' => 'In Progress',
+                        'on_hold' => 'On Hold',
+                        'completed' => 'Completed',
+                        'cancelled' => 'Cancelled',
+                    ];
+                @endphp
+                <p style="margin: 5px 0;"><strong>Status:</strong> <span class="highlight">{{ $statusLabels[$assignedProject->status] ?? ucwords(str_replace('_', ' ', $assignedProject->status)) }}</span></p>
+            </div>
+        @endif
     </div>
 
     <div class="cred-box">

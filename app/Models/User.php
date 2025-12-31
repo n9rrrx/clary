@@ -7,10 +7,11 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Laravel\Cashier\Billable;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, Billable;
 
     protected $fillable = [
         'name',
@@ -18,6 +19,7 @@ class User extends Authenticatable
         'password',
         'role',
         'current_team_id',
+        'plan',
     ];
 
     protected $hidden = [
