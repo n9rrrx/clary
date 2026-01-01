@@ -29,6 +29,23 @@
         $hasIntent = isset($intent) && $intent;
     @endphp
 
+    @if ($errors->any())
+        <div class="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 mb-4">
+            <h3 class="text-sm font-medium text-red-700 dark:text-red-300 mb-2">Registration failed:</h3>
+            <ul class="list-disc list-inside text-sm text-red-600 dark:text-red-400">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    @if (session('warning'))
+        <div class="p-4 rounded-lg bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-700 mb-4">
+            <p class="text-sm text-yellow-700 dark:text-yellow-300">{{ session('warning') }}</p>
+        </div>
+    @endif
+
     <form method="POST" action="{{ route('register') }}" id="registration-form" class="space-y-4">
         @csrf
         <input type="hidden" name="plan" value="{{ $plan }}">
