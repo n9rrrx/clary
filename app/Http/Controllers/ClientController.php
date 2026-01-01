@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Models\User;
 use App\Mail\TeamInvitation;
+use App\Services\PlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -54,6 +55,13 @@ class ClientController extends Controller
     {
         $user = Auth::user();
         $team = $user->currentTeam;
+
+        // Check plan limits
+        $planService = app(PlanService::class);
+        if (!$planService->canCreateClient($user)) {
+            $limit = $planService->getLimit($user, 'clients');
+            return redirect()->back()->with('error', "You've reached the {$limit} client limit on your plan. Upgrade to Pro for unlimited clients.");
+        }
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',

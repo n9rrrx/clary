@@ -4,7 +4,23 @@
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8">
             <div>
                 <h1 class="text-2xl font-bold text-gray-900 dark:text-white">User Management</h1>
-                <p class="text-gray-500 dark:text-gray-400 mt-1">Manage your team members for {{ $team->name }}</p>
+                <div class="flex items-center gap-3 mt-1">
+                    <p class="text-gray-500 dark:text-gray-400">Manage your team members for {{ $team->name }}</p>
+                    @if($isOwner)
+                        <x-plan-usage resource="team_members" />
+                    @endif
+                </div>
+                @if(isset($tagFilter) && $tagFilter)
+                    <div class="mt-2 flex items-center gap-2">
+                        <span class="text-sm text-gray-500 dark:text-gray-400">Filtering by tag:</span>
+                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 text-sm font-medium rounded-full">{{ $tagFilter }}</span>
+                        <a href="{{ route('team.index') }}" class="text-sm text-gray-400 hover:text-red-500 transition-colors">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </a>
+                    </div>
+                @endif
             </div>
             @if($isOwner)
             <button onclick="document.getElementById('inviteModal').classList.remove('hidden')" 
@@ -36,6 +52,8 @@
                     <tr>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Member</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Role</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Tags</th>
+                        <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Budget</th>
                         <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Joined</th>
                         @if($isOwner)
                         <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
@@ -72,6 +90,29 @@
                             <span class="px-3 py-1 text-sm font-medium {{ $roleColors[$role] ?? $roleColors['member'] }} rounded-full capitalize">
                                 {{ $role }}
                             </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            @php
+                                $memberTags = is_string($member->tags) ? json_decode($member->tags, true) : ($member->tags ?? []);
+                                $tagColors = ['bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400', 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400', 'bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-400', 'bg-pink-100 dark:bg-pink-900/30 text-pink-700 dark:text-pink-400'];
+                            @endphp
+                            <div class="flex flex-wrap gap-1">
+                                @forelse($memberTags as $tag)
+                                    <span class="px-2 py-0.5 text-xs font-medium {{ $tagColors[$loop->index % count($tagColors)] }} rounded-full">{{ $tag }}</span>
+                                @empty
+                                    <span class="text-xs text-gray-400">—</span>
+                                @endforelse
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">
+                            @php
+                                $budget = $member->pivot->budget_limit ?? 0;
+                            @endphp
+                            @if($budget > 0)
+                                <span class="font-semibold text-green-600 dark:text-green-400">${{ number_format($budget, 2) }}</span>
+                            @else
+                                <span class="text-xs text-gray-400">—</span>
+                            @endif
                         </td>
                         <td class="px-6 py-4 text-gray-500 dark:text-gray-400 text-sm">
                             {{ $member->created_at->diffForHumans() }}
@@ -212,6 +253,42 @@
                         <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">You can assign them to a project now, or do it later from the project page.</p>
                     </div>
                     @endif
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Specialization <span class="text-gray-400 font-normal">(Optional)</span>
+                        </label>
+                        <div class="grid grid-cols-2 gap-2">
+                            @php
+                                $tagOptions = [
+                                    'Backend Developer' => '💻',
+                                    'Frontend Developer' => '🎨',
+                                    'UI/UX Designer' => '🖼️',
+                                    'Project Manager' => '📋',
+                                    'Viewer Only' => '👁️',
+                                    'HR Only' => '👔',
+                                ];
+                            @endphp
+                            @foreach($tagOptions as $tag => $icon)
+                                <label class="flex items-center gap-2 p-2 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-midnight-900 cursor-pointer transition-colors">
+                                    <input type="checkbox" name="tags[]" value="{{ $tag }}" 
+                                           class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
+                                    <span class="text-sm text-gray-700 dark:text-gray-300">{{ $icon }} {{ $tag }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">Select all that apply to this team member.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                            Budget Limit ($) <span class="text-gray-400 font-normal">(Optional)</span>
+                        </label>
+                        <input type="number" name="budget_limit" step="0.01" min="0"
+                               class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-midnight-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                               placeholder="5000.00">
+                        <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Maximum budget this member can work with.</p>
+                    </div>
 
                     <div class="pt-4">
                         <button type="submit" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-lg hover:shadow-lg hover:shadow-blue-500/30 transition-all">

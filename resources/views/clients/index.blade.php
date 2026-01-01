@@ -7,6 +7,7 @@
                 <span class="px-2 py-0.5 rounded-full bg-gray-100 dark:bg-midnight-800 text-xs text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-line">
                     {{ $clients->count() ?? 0 }} Total
                 </span>
+                <x-plan-usage resource="clients" />
             </div>
 
             <div class="flex items-center space-x-3">

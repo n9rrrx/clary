@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\TeamMemberController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\PeopleController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AgencyProfileController;
@@ -48,6 +49,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/team', [TeamMemberController::class, 'index'])->name('team.index');
     Route::post('/team/invite', [TeamMemberController::class, 'store'])->name('team.invite');
     Route::delete('/team/{user}', [TeamMemberController::class, 'destroy'])->name('team.remove');
+    
+    // 4. PEOPLE MANAGEMENT (View all team members by tag)
+    Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
 
     // 4. PROFILE SETTINGS
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

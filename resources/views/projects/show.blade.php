@@ -7,16 +7,24 @@
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">{{ $project->name }}</h1>
                     @php
                         $statusColors = [
-                            'planning' => 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+                            'planning' => 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
                             'in_progress' => 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
                             'completed' => 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
                             'on_hold' => 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800',
                             'cancelled' => 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
                         ];
+                        $statusLabels = [
+                            'planning' => 'Not Started',
+                            'in_progress' => 'In Progress',
+                            'completed' => 'Completed',
+                            'on_hold' => 'On Hold',
+                            'cancelled' => 'Cancelled',
+                        ];
                         $color = $statusColors[$project->status] ?? 'bg-gray-100 text-gray-800';
+                        $statusLabel = $statusLabels[$project->status] ?? ucwords(str_replace('_', ' ', $project->status));
                     @endphp
                     <span class="px-3 py-1 text-sm font-semibold rounded-full border {{ $color }}">
-                        {{ ucwords(str_replace('_', ' ', $project->status)) }}
+                        {{ $statusLabel }}
                     </span>
                 </div>
                 <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
@@ -25,9 +33,15 @@
             </div>
 
             <div class="flex items-center gap-3">
+                @php
+                    $userRole = Auth::user()->teams()->where('team_id', $project->team_id)->first()?->pivot?->role ?? 'member';
+                    $canEditProject = Auth::user()->isOwnerOfCurrentTeam() || $userRole === 'admin';
+                @endphp
+                @if($canEditProject)
                 <a href="{{ route('projects.edit', $project->id) }}" class="px-4 py-2 bg-white dark:bg-midnight-800 border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 font-medium rounded-md hover:bg-gray-50 dark:hover:bg-midnight-700 transition-colors shadow-sm">
                     Edit Project
                 </a>
+                @endif
                 <a href="{{ route('tasks.create', ['project_id' => $project->id]) }}"
                    class="px-4 py-2 bg-blue-600 text-white font-medium rounded-md hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition-all">
                     + Add Task

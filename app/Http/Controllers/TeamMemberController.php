@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Team;
 use App\Models\Project;
 use App\Mail\TeamInvitation;
+use App\Services\PlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
@@ -17,9 +18,9 @@ use Illuminate\Support\Facades\Auth;
 class TeamMemberController extends Controller
 {
     /**
-     * Show team members list
+     * Show team members list with optional tag filtering
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
         $team = $user->currentTeam;
@@ -29,12 +30,22 @@ class TeamMemberController extends Controller
         }
 
         $members = $team->members()->get();
+        
+        // Filter by tag if provided
+        $tagFilter = $request->get('tag');
+        if ($tagFilter) {
+            $members = $members->filter(function ($member) use ($tagFilter) {
+                $memberTags = is_string($member->tags) ? json_decode($member->tags, true) : ($member->tags ?? []);
+                return is_array($memberTags) && in_array($tagFilter, $memberTags);
+            });
+        }
+        
         $isOwner = $team->owner_id === $user->id;
         
         // Get projects for optional assignment during invite
         $projects = $team ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get() : collect();
 
-        return view('team.index', compact('members', 'team', 'isOwner', 'projects'));
+        return view('team.index', compact('members', 'team', 'isOwner', 'projects', 'tagFilter'));
     }
 
     /**
@@ -55,6 +66,14 @@ class TeamMemberController extends Controller
         // Only owner/admin can invite
         if ($team->owner_id !== $currentUser->id) {
             return redirect()->back()->with('error', 'Only the team owner can invite members.');
+        }
+
+        // Check plan limits (based on team owner's plan)
+        $teamOwner = User::find($team->owner_id);
+        $planService = app(PlanService::class);
+        if (!$planService->canAddTeamMember($teamOwner)) {
+            $limit = $planService->getLimit($teamOwner, 'team_members');
+            return redirect()->back()->with('error', "You've reached the {$limit} team member limit on your plan. Upgrade to Pro for unlimited team members.");
         }
 
         $email = $request->email;
@@ -104,17 +123,22 @@ class TeamMemberController extends Controller
         // Create new user with temporary password
         $tempPassword = Str::random(10);
 
+        // Get tags from checkbox array
+        $tags = $request->tags ?? [];
+
         $newUser = User::create([
             'name' => $request->name,
             'email' => $email,
             'password' => Hash::make($tempPassword),
             'role' => 'member',
             'current_team_id' => $team->id,
+            'tags' => $tags,
         ]);
 
-        // Add to team with specified role
+        // Add to team with specified role and budget
         $team->members()->attach($newUser->id, [
             'role' => $request->role,
+            'budget_limit' => $request->budget_limit ?? 0,
         ]);
 
         // Optionally assign to project if provided
@@ -146,7 +170,8 @@ class TeamMemberController extends Controller
     }
 
     /**
-     * Remove a team member and all their data
+     * Remove a team member and completely delete their account
+     * When re-added, they will be a fresh new user
      */
     public function destroy(User $user)
     {
@@ -161,17 +186,27 @@ class TeamMemberController extends Controller
             return redirect()->back()->with('error', 'You cannot remove yourself from the team.');
         }
 
+        // Don't allow deleting the team owner
+        if ($user->id === $team->owner_id) {
+            return redirect()->back()->with('error', 'Cannot remove the team owner.');
+        }
+
         // Delete user's activities (chat messages)
         Activity::where('user_id', $user->id)->delete();
 
         // Unassign user's tasks (set assigned_to to null instead of deleting)
         Task::where('assigned_to_user_id', $user->id)
-            ->where('team_id', $team->id)
             ->update(['assigned_to_user_id' => null]);
 
-        // Detach from team
-        $team->members()->detach($user->id);
+        // Detach from all projects
+        $user->projects()->detach();
 
-        return redirect()->back()->with('success', 'Member removed and their activities cleared.');
+        // Detach from all teams
+        $user->teams()->detach();
+
+        // Completely delete the user from the database
+        $user->delete();
+
+        return redirect()->back()->with('success', 'Member completely removed from the system.');
     }
 }

@@ -27,6 +27,9 @@
                 <span class="px-3 py-1 text-xs font-medium rounded-full bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300">
                     {{ $projects->whereIn('status', ['planning', 'in_progress', 'on_hold'])->count() }} Active
                 </span>
+                @if(Auth::user()->isOwnerOfCurrentTeam())
+                    <x-plan-usage resource="projects" />
+                @endif
             </div>
             @if(Auth::user()->isOwnerOfCurrentTeam())
                 <div class="mt-4 md:mt-0">
