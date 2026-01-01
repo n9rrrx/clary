@@ -6,6 +6,7 @@ use App\Models\Project;
 use App\Models\Client;
 use App\Models\Activity;
 use App\Models\User;
+use App\Services\PlanService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -71,6 +72,13 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         $team = $user->currentTeam;
+
+        // Check plan limits
+        $planService = app(PlanService::class);
+        if (!$planService->canCreateProject($user)) {
+            $limit = $planService->getLimit($user, 'projects');
+            return redirect()->back()->with('error', "You've reached the {$limit} project limit on your plan. Upgrade to Pro for unlimited projects.");
+        }
 
         $validated = $request->validate([
             'client_id' => 'nullable|exists:clients,id',

@@ -205,16 +205,24 @@
                                                 </h3>
                                                 @php
                                                     $statusColors = [
-                                                        'planning' => 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+                                                        'planning' => 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300',
                                                         'in_progress' => 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
                                                         'completed' => 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
                                                         'on_hold' => 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
                                                         'cancelled' => 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
                                                     ];
+                                                    $statusLabels = [
+                                                        'planning' => 'Not Started',
+                                                        'in_progress' => 'In Progress',
+                                                        'completed' => 'Completed',
+                                                        'on_hold' => 'On Hold',
+                                                        'cancelled' => 'Cancelled',
+                                                    ];
                                                     $statusColor = $statusColors[$project->status] ?? 'bg-gray-100 text-gray-800';
+                                                    $statusLabel = $statusLabels[$project->status] ?? ucwords(str_replace('_', ' ', $project->status));
                                                 @endphp
                                                 <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full {{ $statusColor }}">
-                                                    {{ ucwords(str_replace('_', ' ', $project->status)) }}
+                                                    {{ $statusLabel }}
                                                 </span>
                                             </div>
                                         </div>

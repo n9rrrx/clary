@@ -71,7 +71,7 @@
 
             {{-- Upgrade Section (for free users) --}}
             @if($currentPlan === 'free')
-                <div class="p-6 bg-gradient-to-r from-blue-600 to-indigo-600 shadow rounded-lg text-white">
+                <div class="p-6 bg-gradient-to-r from-blue-600 to-cyan-600 shadow rounded-lg text-white">
                     <h3 class="text-lg font-semibold mb-2">Upgrade to Pro</h3>
                     <p class="text-blue-100 mb-4">Get unlimited projects, team members, and advanced analytics.</p>
 
@@ -224,17 +224,18 @@
 
                 const style = {
                     base: {
-                        color: document.documentElement.classList.contains('dark') ? '#e5e7eb' : '#1f2937',
+                        color: '#ffffff',
                         fontFamily: 'Inter, sans-serif',
                         fontSmoothing: 'antialiased',
                         fontSize: '16px',
                         '::placeholder': {
-                            color: '#9ca3af'
-                        }
+                            color: 'rgba(255, 255, 255, 0.6)'
+                        },
+                        iconColor: '#ffffff'
                     },
                     invalid: {
-                        color: '#ef4444',
-                        iconColor: '#ef4444'
+                        color: '#fca5a5',
+                        iconColor: '#fca5a5'
                     }
                 };
 

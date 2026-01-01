@@ -75,6 +75,58 @@
             animation: float 6s ease-in-out infinite;
         }
 
+        /* Floating path animations for SaaS icons */
+        @keyframes floatPath1 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(20px, -30px) rotate(5deg); }
+            50% { transform: translate(-10px, -50px) rotate(-3deg); }
+            75% { transform: translate(30px, -20px) rotate(2deg); }
+        }
+
+        @keyframes floatPath2 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-25px, 15px) rotate(-5deg); }
+            50% { transform: translate(20px, 30px) rotate(3deg); }
+            75% { transform: translate(-15px, 10px) rotate(-2deg); }
+        }
+
+        @keyframes floatPath3 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(15px, 25px) rotate(8deg); }
+            50% { transform: translate(-20px, 15px) rotate(-5deg); }
+            75% { transform: translate(10px, -20px) rotate(3deg); }
+        }
+
+        @keyframes floatPath4 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-30px, -15px) rotate(-3deg); }
+            50% { transform: translate(15px, -35px) rotate(5deg); }
+            75% { transform: translate(-20px, 10px) rotate(-2deg); }
+        }
+
+        @keyframes floatPath5 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(25px, 20px) rotate(6deg); }
+            50% { transform: translate(-15px, -25px) rotate(-4deg); }
+            75% { transform: translate(20px, -10px) rotate(2deg); }
+        }
+
+        @keyframes floatPath6 {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(-20px, -20px) rotate(-4deg); }
+            50% { transform: translate(25px, 10px) rotate(6deg); }
+            75% { transform: translate(-10px, 25px) rotate(-3deg); }
+        }
+
+        .floating-icon {
+            will-change: transform;
+            transition: opacity 0.3s ease;
+        }
+
+        .floating-icon:hover {
+            animation-play-state: paused;
+        }
+
         .animate-fade-in-up {
             animation: fadeInUp 0.8s ease-out forwards;
         }
@@ -434,6 +486,62 @@
 
         <!-- Subtle grid pattern -->
         <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect fill=%22none%22 stroke=%22%230066FF%22 stroke-width=%220.5%22 width=%2240%22 height=%2240%22/></svg>');"></div>
+        
+        <!-- Floating SaaS/Finance Icons (Background Layer) -->
+        <div class="floating-icons-container absolute inset-0 pointer-events-none z-[1]">
+            <!-- Chart Icon - Top Left Area -->
+            <div class="floating-icon absolute top-[15%] left-[8%]" style="animation: floatPath1 12s ease-in-out infinite;">
+                <div class="w-12 h-12 bg-gradient-to-br from-blue-500/70 to-cyan-500/70 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30 backdrop-blur-sm">
+                    <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Dollar Icon - Left Middle -->
+            <div class="floating-icon absolute top-[45%] left-[3%]" style="animation: floatPath2 14s ease-in-out infinite;">
+                <div class="w-10 h-10 bg-gradient-to-br from-emerald-500/70 to-green-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/30 backdrop-blur-sm">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Percentage Icon - Top Right -->
+            <div class="floating-icon absolute top-[10%] right-[5%]" style="animation: floatPath3 10s ease-in-out infinite;">
+                <div class="w-11 h-11 bg-gradient-to-br from-purple-500/70 to-indigo-500/70 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 backdrop-blur-sm">
+                    <span class="text-white font-bold text-base">%</span>
+                </div>
+            </div>
+            
+            <!-- Layers Icon - Right Middle -->
+            <div class="floating-icon absolute top-[55%] right-[2%]" style="animation: floatPath4 16s ease-in-out infinite;">
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-500/70 to-orange-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30 backdrop-blur-sm">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Lightning Icon - Bottom Left -->
+            <div class="floating-icon absolute bottom-[15%] left-[12%]" style="animation: floatPath5 11s ease-in-out infinite;">
+                <div class="w-9 h-9 bg-gradient-to-br from-yellow-500/70 to-amber-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-yellow-500/30 backdrop-blur-sm">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                    </svg>
+                </div>
+            </div>
+            
+            <!-- Pie Chart Icon - Bottom Right -->
+            <div class="floating-icon absolute bottom-[20%] right-[8%]" style="animation: floatPath6 13s ease-in-out infinite;">
+                <div class="w-10 h-10 bg-gradient-to-br from-pink-500/70 to-rose-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-pink-500/30 backdrop-blur-sm">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/>
+                    </svg>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="max-w-7xl mx-auto relative z-10 w-full">
@@ -595,22 +703,7 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Decorative Elements -->
-                <!-- Star/Sparkle -->
-                <svg class="absolute top-16 right-1/4 w-6 h-6 text-yellow-400 animate-pulse" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
-                </svg>
-                <svg class="absolute bottom-32 left-1/4 w-4 h-4 text-blue-400 animate-pulse" style="animation-delay: 0.5s;" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 0L14.59 9.41L24 12L14.59 14.59L12 24L9.41 14.59L0 12L9.41 9.41L12 0Z"/>
-                </svg>
-
-                <!-- Circles -->
-                <div class="absolute top-1/4 right-8 w-3 h-3 bg-purple-400 rounded-full animate-bounce" style="animation-delay: 0.3s;"></div>
-                <div class="absolute bottom-1/3 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-bounce" style="animation-delay: 0.7s;"></div>
-                <div class="absolute top-1/2 right-1/3 w-4 h-4 border-2 border-blue-300 dark:border-blue-600 rounded-full animate-ping opacity-50"></div>
             </div>
-        </div>
     </div>
 </section>
 
@@ -1384,7 +1477,7 @@
 
         <div class="border-t border-blue-200/50 dark:border-blue-900/50 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
             <p class="text-gray-500 dark:text-gray-400 text-sm">
-                © 2025 Clary. All rights reserved.
+                © 2026 Clary. All rights reserved.
             </p>
             <p class="text-gray-500 dark:text-gray-400 text-sm">
                 Made with clarity and care

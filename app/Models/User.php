@@ -20,6 +20,9 @@ class User extends Authenticatable
         'role',
         'current_team_id',
         'plan',
+        'tags',
+        'user_type',
+        'designation',
     ];
 
     protected $hidden = [
@@ -32,6 +35,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'tags' => 'array',
         ];
     }
 
@@ -78,5 +82,39 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Project::class, 'project_user')
             ->withTimestamps();
+    }
+
+    // --- PLAN HELPER METHODS ---
+
+    /**
+     * Get the user's current plan name
+     */
+    public function getPlanName(): string
+    {
+        return config("plans.{$this->plan}.name", 'Starter');
+    }
+
+    /**
+     * Check if user can use a specific feature
+     */
+    public function canUseFeature(string $feature): bool
+    {
+        return app(\App\Services\PlanService::class)->hasFeature($this, $feature);
+    }
+
+    /**
+     * Get the limit for a specific resource
+     */
+    public function getResourceLimit(string $resource): ?int
+    {
+        return app(\App\Services\PlanService::class)->getLimit($this, $resource);
+    }
+
+    /**
+     * Check if user is on a paid plan
+     */
+    public function isOnPaidPlan(): bool
+    {
+        return in_array($this->plan, ['pro', 'enterprise']);
     }
 }

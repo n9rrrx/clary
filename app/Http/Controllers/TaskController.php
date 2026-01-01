@@ -51,8 +51,10 @@ class TaskController extends Controller
             ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get()
             : collect();
 
-        // Get team members for assignment
-        $teamMembers = $team ? $team->members()->get() : collect();
+        // Get team members for assignment (exclude owner - they don't work on tasks)
+        $teamMembers = $team 
+            ? $team->members()->where('user_id', '!=', $team->owner_id)->get() 
+            : collect();
 
         return view('tasks.create', compact('projects', 'teamMembers'));
     }
@@ -104,7 +106,10 @@ class TaskController extends Controller
             ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get()
             : collect();
 
-        $teamMembers = $team ? $team->members()->get() : collect();
+        // Get team members for assignment (exclude owner)
+        $teamMembers = $team 
+            ? $team->members()->where('user_id', '!=', $team->owner_id)->get() 
+            : collect();
 
         return view('tasks.edit', compact('task', 'projects', 'teamMembers'));
     }

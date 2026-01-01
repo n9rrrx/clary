@@ -1,37 +1,58 @@
 @php
     /**
      * ATLASSIAN-STYLE MULTI-TENANCY LOGIC
-     * 1. Super Admin/Admin: Platform Owner (Sees all clients/tags)
-     * 2. Company Admin: Site Owner (Sees only their company data and User Management)
-     * 3. User: Team Member (Sees only their company data, NO User Management)
+     * Tags from both Team Members (Users) and Clients
      */
     use App\Models\Client;
+    use App\Models\User;
+    use App\Models\Team;
     use Illuminate\Support\Facades\Auth;
 
-    $tagCounts = [];
+    $teamMemberTags = [];
+    $clientTags = [];
+    $allTags = [];
 
     if (Auth::check()) {
         $user = Auth::user();
+        $team = $user->currentTeam;
 
-        // --- DATA SCOPING ---
-        if ($user->role === 'super_admin' || $user->role === 'admin') {
-            $clients = Client::all();
-        } else {
-            $clients = Client::where('id', $user->client_id)->get();
-        }
+        if ($team) {
+            // Get tags from team members
+            $members = $team->members;
+            foreach ($members as $member) {
+                $memberTagsArray = is_string($member->tags) ? json_decode($member->tags, true) : ($member->tags ?? []);
+                if (is_array($memberTagsArray)) {
+                    foreach ($memberTagsArray as $tag) {
+                        $tag = trim($tag);
+                        if ($tag) {
+                            $teamMemberTags[$tag] = ($teamMemberTags[$tag] ?? 0) + 1;
+                            $allTags[$tag] = ($allTags[$tag] ?? 0) + 1;
+                        }
+                    }
+                }
+            }
 
-        $allTags = [];
-        foreach ($clients as $client) {
-            $tags = is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []);
-            if (is_array($tags)) {
-                foreach ($tags as $tag) {
-                    $allTags[] = trim($tag);
+            // Get tags from clients
+            $clients = $team->clients;
+            foreach ($clients as $client) {
+                $clientTagsArray = is_string($client->tags) ? json_decode($client->tags, true) : ($client->tags ?? []);
+                if (is_array($clientTagsArray)) {
+                    foreach ($clientTagsArray as $tag) {
+                        $tag = trim($tag);
+                        if ($tag) {
+                            $clientTags[$tag] = ($clientTags[$tag] ?? 0) + 1;
+                            $allTags[$tag] = ($allTags[$tag] ?? 0) + 1;
+                        }
+                    }
                 }
             }
         }
-        $tagCounts = array_count_values($allTags);
-        arsort($tagCounts);
-        $tagCounts = array_slice($tagCounts, 0, 5);
+
+        // Sort by count and limit
+        arsort($allTags);
+        $tagCounts = array_slice($allTags, 0, 10, true);
+    } else {
+        $tagCounts = [];
     }
 
     $colors = [
@@ -40,6 +61,11 @@
         ['bg' => 'bg-blue-500',   'shadow' => 'rgba(59,130,246,0.4)'],
         ['bg' => 'bg-orange-500', 'shadow' => 'rgba(249,115,22,0.4)'],
         ['bg' => 'bg-pink-500',   'shadow' => 'rgba(236,72,153,0.4)'],
+        ['bg' => 'bg-cyan-500',   'shadow' => 'rgba(6,182,212,0.4)'],
+        ['bg' => 'bg-amber-500',  'shadow' => 'rgba(245,158,11,0.4)'],
+        ['bg' => 'bg-indigo-500', 'shadow' => 'rgba(99,102,241,0.4)'],
+        ['bg' => 'bg-rose-500',   'shadow' => 'rgba(244,63,94,0.4)'],
+        ['bg' => 'bg-teal-500',   'shadow' => 'rgba(20,184,166,0.4)'],
     ];
 @endphp
 
@@ -105,6 +131,16 @@
                 <span class="sidebar-text ml-3">User Management</span>
                 <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">User Management</div>
             </a>
+            <a href="{{ route('people.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('people.*') ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400' }}">
+                <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                <span class="sidebar-text ml-3">People</span>
+                <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">People</div>
+            </a>
+            <a href="{{ route('subscription.manage') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('subscription.*') ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400' }}">
+                <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                <span class="sidebar-text ml-3">Subscription</span>
+                <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Subscription</div>
+            </a>
         @endif
 
         @can('view-projects')
@@ -140,7 +176,7 @@
                             $style = $colors[$loop->index % count($colors)];
                             $isActive = request('tag') == $tagName;
                         @endphp
-                        <a href="{{ route('clients.index', ['tag' => $tagName]) }}" class="nav-item group relative flex items-center px-3 py-1.5 rounded-md transition-colors {{ $isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500' : 'hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400' }}">
+                        <a href="{{ route('people.index', ['tag' => $tagName]) }}" class="nav-item group relative flex items-center px-3 py-1.5 rounded-md transition-colors {{ $isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500' : 'hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400' }}">
                             <div class="flex items-center justify-center flex-shrink-0 w-5 h-5">
                                 <span class="w-2.5 h-2.5 rounded-full {{ $style['bg'] }}" style="box-shadow: 0 0 8px {{ $style['shadow'] }}"></span>
                             </div>
@@ -260,5 +296,6 @@
         btn.addEventListener('click', e => { e.preventDefault(); menu.classList.toggle('hidden'); });
     })();
 </script>
+@stack('scripts')
 </body>
 </html>
