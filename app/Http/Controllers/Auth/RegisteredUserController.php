@@ -95,6 +95,13 @@ class RegisteredUserController extends Controller
     {
         $plan = $request->input('plan', 'free');
         $requiresPayment = $plan !== 'free' && array_key_exists($plan, $this->plans);
+        
+        \Log::info('Registration attempt', [
+            'plan' => $plan,
+            'requiresPayment' => $requiresPayment,
+            'has_payment_method' => $request->has('payment_method'),
+            'payment_method_value' => $request->payment_method ? substr($request->payment_method, 0, 20) . '...' : null,
+        ]);
 
         // Base validation rules
         $rules = [
@@ -138,19 +145,36 @@ class RegisteredUserController extends Controller
 
         // Handle paid subscription
         if ($requiresPayment && $request->payment_method) {
+            \Log::info('Starting subscription creation for user', [
+                'user_id' => $user->id,
+                'plan' => $plan,
+                'price_id' => $this->plans[$plan]['stripe_price_id'] ?? 'NOT SET',
+            ]);
+            
             try {
+                \Log::info('Creating Stripe customer...');
                 $user->createOrGetStripeCustomer();
+                
+                \Log::info('Updating default payment method...');
                 $user->updateDefaultPaymentMethod($request->payment_method);
 
                 $priceId = $this->plans[$plan]['stripe_price_id'];
 
                 if ($priceId) {
+                    \Log::info('Creating subscription with trial...', ['price_id' => $priceId]);
                     $user->newSubscription('default', $priceId)
                         ->trialDays(14)
                         ->create($request->payment_method);
+                    \Log::info('Subscription created successfully!');
+                } else {
+                    \Log::warning('No price ID found for plan, skipping subscription', ['plan' => $plan]);
                 }
             } catch (\Exception $e) {
-                \Log::error('Subscription creation failed: ' . $e->getMessage());
+                \Log::error('Subscription creation failed', [
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                    'user_id' => $user->id,
+                ]);
 
                 // Update user plan to free if subscription fails
                 $user->update(['plan' => 'free']);
