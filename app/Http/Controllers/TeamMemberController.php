@@ -30,7 +30,7 @@ class TeamMemberController extends Controller
         }
 
         $members = $team->members()->get();
-        
+
         // Filter by tag if provided
         $tagFilter = $request->get('tag');
         if ($tagFilter) {
@@ -39,9 +39,9 @@ class TeamMemberController extends Controller
                 return is_array($memberTags) && in_array($tagFilter, $memberTags);
             });
         }
-        
+
         $isOwner = $team->owner_id === $user->id;
-        
+
         // Get projects for optional assignment during invite
         $projects = $team ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get() : collect();
 
@@ -111,7 +111,8 @@ class TeamMemberController extends Controller
                     $team->name,
                     0,
                     ucfirst($request->role),
-                    $assignedProject
+                    $assignedProject,
+                    auth()->user() // Pass the sender (owner)
                 ));
             } catch (\Exception $e) {
                 \Log::error('Failed to send team invitation email: ' . $e->getMessage());
@@ -160,7 +161,8 @@ class TeamMemberController extends Controller
                 $team->name,
                 0, // No budget in Atlassian model
                 ucfirst($request->role),
-                $assignedProject
+                $assignedProject,
+                auth()->user() // Pass the sender (owner)
             ));
         } catch (\Exception $e) {
             \Log::error('Failed to send team invitation email: ' . $e->getMessage());

@@ -52,8 +52,16 @@ class TeamController extends Controller
             'company_id' => Auth::user()->company_id
         ]);
 
-        // 3. And use it here for the email
-        Mail::to($user->email)->send(new TeamInvitation($user, $tempPassword));
+        // Send invitation email with sender info
+        Mail::to($user->email)->send(new TeamInvitation(
+            $user,
+            $tempPassword,
+            'Your Team', // Team name
+            0, // Budget
+            'Member', // Role
+            null, // Project
+            Auth::user() // Pass the sender (owner)
+        ));
 
         return redirect()->back()->with('success', 'Team member invited successfully.');
     }

@@ -6,6 +6,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>{{ config('app.name', 'Clary') }}</title>
+    <link rel="icon" type="image/svg+xml" href="/logos/logo-clary-spider.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -17,8 +18,8 @@
 
     <div class="mb-6 text-center">
         <a href="/" class="flex flex-col items-center gap-2 group">
-            <div class="w-12 h-12 rounded-lg bg-accent-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-accent-500/20 group-hover:scale-105 transition-transform duration-300">
-                C
+            <div class="w-14 h-14 group-hover:scale-105 transition-transform duration-300">
+                <img src="/logos/logo-clary-spider.svg" alt="Clary" class="w-full h-full drop-shadow-lg">
             </div>
             <span class="text-xl font-bold text-gray-900 dark:text-white tracking-tight">Clary</span>
         </a>

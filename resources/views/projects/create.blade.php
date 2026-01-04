@@ -23,6 +23,18 @@
                     @error('name') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                 </div>
 
+                <div>
+                    <label for="client_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Client</label>
+                    <select name="client_id" id="client_id"
+                            class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
+                        <option value="">No Client (Internal Project)</option>
+                        @foreach($clients as $client)
+                            <option value="{{ $client->id }}">{{ $client->name }} - {{ ucfirst($client->type) }}</option>
+                        @endforeach
+                    </select>
+                    @error('client_id') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
+                </div>
+
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div>
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
