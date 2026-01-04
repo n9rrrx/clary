@@ -76,6 +76,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Clary') }}</title>
+    <link rel="icon" type="image/svg+xml" href="/logos/logo-clary-spider.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -90,10 +91,6 @@
         #sidebar.collapsed #logo-link { justify-content: center; width: 100%; }
         #sidebar.collapsed .nav-item { justify-content: center; padding-left: 0; padding-right: 0; }
         #sidebar.collapsed .sidebar-footer { padding: 10px 0; justify-content: center; }
-        #logo-c { display: flex; }
-        #logo-burger { display: none; }
-        #sidebar.collapsed #logo-link:hover #logo-c { display: none; }
-        #sidebar.collapsed #logo-link:hover #logo-burger { display: flex; }
         .nav-tooltip { display: none; opacity: 0; transition: opacity 0.2s; }
         #sidebar.collapsed .nav-item:hover .nav-tooltip { display: block; opacity: 1; }
     </style>
@@ -104,11 +101,8 @@
 
     <div class="sidebar-header h-16 flex items-center justify-between px-4 border-b border-gray-200 dark:border-line transition-all duration-300 overflow-hidden">
         <a href="{{ route('dashboard') }}" id="logo-link" class="flex items-center gap-3 overflow-hidden group focus:outline-none w-full">
-            <div id="logo-container" class="w-8 h-8 rounded relative flex-shrink-0 transition-all duration-200 group-hover:shadow-lg group-hover:shadow-accent-500/30">
-                <div id="logo-c" class="absolute inset-0 bg-accent-600 rounded flex items-center justify-center text-white font-bold shadow-lg shadow-accent-500/30 group-hover:bg-blue-600 transition-colors">C</div>
-                <div id="logo-burger" class="absolute inset-0 bg-blue-600 rounded items-center justify-center text-white shadow-lg shadow-blue-500/30">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                </div>
+            <div id="logo-container" class="w-8 h-8 flex-shrink-0 transition-all duration-200 group-hover:scale-110">
+                <img src="/logos/logo-clary-spider.svg" alt="Clary" class="w-full h-full drop-shadow-lg">
             </div>
             <span class="sidebar-text font-semibold tracking-wide text-gray-900 dark:text-gray-100 whitespace-nowrap">Clary</span>
         </a>
@@ -151,6 +145,14 @@
             </a>
         @endcan
 
+        @if(Auth::user()->isOwnerOfCurrentTeam())
+            <a href="{{ route('clients.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('clients.*') ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400' }}">
+                <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                <span class="sidebar-text ml-3">Clients</span>
+                <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">Clients</div>
+            </a>
+        @endif
+
         @can('view-tasks')
             <a href="{{ route('tasks.index') }}" class="nav-item group relative flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors {{ request()->routeIs('tasks.*') ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400' : 'text-gray-600 dark:text-gray-400 hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400' }}">
                 <svg class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
@@ -175,8 +177,13 @@
                         @php
                             $style = $colors[$loop->index % count($colors)];
                             $isActive = request('tag') == $tagName;
+                            // Determine if this is a client tag or people tag
+                            $isClientTag = isset($clientTags[$tagName]);
+                            $isPeopleTag = isset($teamMemberTags[$tagName]);
+                            // Route to clients if it's only a client tag, otherwise people
+                            $tagRoute = ($isClientTag && !$isPeopleTag) ? route('clients.index', ['tag' => $tagName]) : route('people.index', ['tag' => $tagName]);
                         @endphp
-                        <a href="{{ route('people.index', ['tag' => $tagName]) }}" class="nav-item group relative flex items-center px-3 py-1.5 rounded-md transition-colors {{ $isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500' : 'hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400' }}">
+                        <a href="{{ $tagRoute }}" class="nav-item group relative flex items-center px-3 py-1.5 rounded-md transition-colors {{ $isActive ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 ring-1 ring-blue-500' : 'hover:bg-blue-600/10 hover:text-blue-600 dark:hover:text-blue-400 text-gray-600 dark:text-gray-400' }}">
                             <div class="flex items-center justify-center flex-shrink-0 w-5 h-5">
                                 <span class="w-2.5 h-2.5 rounded-full {{ $style['bg'] }}" style="box-shadow: 0 0 8px {{ $style['shadow'] }}"></span>
                             </div>
@@ -184,7 +191,7 @@
                                 <span class="text-sm truncate group-hover:text-blue-600 dark:group-hover:text-blue-400">{{ $tagName }}</span>
                                 <span class="text-xs text-gray-500 dark:text-gray-600 group-hover:text-blue-500">{{ $count }}</span>
                             </div>
-                            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">{{ $tagName }}</div>
+                            <div class="nav-tooltip fixed left-16 bg-gray-900 text-white text-xs px-2 py-1 rounded shadow-lg z-50 whitespace-nowrap ml-2">{{ $tagName }}{{ $isClientTag ? ' (Client)' : '' }}</div>
                         </a>
                     @endforeach
                 @else

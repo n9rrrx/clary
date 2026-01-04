@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'Clary Portal') }}</title>
+    <link rel="icon" type="image/svg+xml" href="/logos/logo-clary-spider.svg">
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -15,7 +16,9 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex items-center">
-                <div class="w-8 h-8 rounded bg-accent-600 flex items-center justify-center text-white font-bold mr-3">C</div>
+                <div class="w-8 h-8 mr-3">
+                    <img src="/logos/logo-clary-spider.svg" alt="Clary" class="w-full h-full">
+                </div>
                 <span class="font-bold text-lg tracking-tight">Clary <span class="text-accent-500 font-normal">Portal</span></span>
             </div>
 

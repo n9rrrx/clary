@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ config('app.name', 'Clary') }} - Crystal Clear Project Management</title>
+    <link rel="icon" type="image/svg+xml" href="/logos/logo-clary-spider.svg">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -486,7 +487,7 @@
 
         <!-- Subtle grid pattern -->
         <div class="absolute inset-0 opacity-[0.02] dark:opacity-[0.03]" style="background-image: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect fill=%22none%22 stroke=%22%230066FF%22 stroke-width=%220.5%22 width=%2240%22 height=%2240%22/></svg>');"></div>
-        
+
         <!-- Floating SaaS/Finance Icons (Background Layer) -->
         <div class="floating-icons-container absolute inset-0 pointer-events-none z-[1]">
             <!-- Chart Icon - Top Left Area -->
@@ -497,7 +498,7 @@
                     </svg>
                 </div>
             </div>
-            
+
             <!-- Dollar Icon - Left Middle -->
             <div class="floating-icon absolute top-[45%] left-[3%]" style="animation: floatPath2 14s ease-in-out infinite;">
                 <div class="w-10 h-10 bg-gradient-to-br from-emerald-500/70 to-green-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-emerald-500/30 backdrop-blur-sm">
@@ -506,14 +507,14 @@
                     </svg>
                 </div>
             </div>
-            
+
             <!-- Percentage Icon - Top Right -->
             <div class="floating-icon absolute top-[10%] right-[5%]" style="animation: floatPath3 10s ease-in-out infinite;">
                 <div class="w-11 h-11 bg-gradient-to-br from-purple-500/70 to-indigo-500/70 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/30 backdrop-blur-sm">
                     <span class="text-white font-bold text-base">%</span>
                 </div>
             </div>
-            
+
             <!-- Layers Icon - Right Middle -->
             <div class="floating-icon absolute top-[55%] right-[2%]" style="animation: floatPath4 16s ease-in-out infinite;">
                 <div class="w-10 h-10 bg-gradient-to-br from-amber-500/70 to-orange-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-amber-500/30 backdrop-blur-sm">
@@ -522,7 +523,7 @@
                     </svg>
                 </div>
             </div>
-            
+
             <!-- Lightning Icon - Bottom Left -->
             <div class="floating-icon absolute bottom-[15%] left-[12%]" style="animation: floatPath5 11s ease-in-out infinite;">
                 <div class="w-9 h-9 bg-gradient-to-br from-yellow-500/70 to-amber-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-yellow-500/30 backdrop-blur-sm">
@@ -531,7 +532,7 @@
                     </svg>
                 </div>
             </div>
-            
+
             <!-- Pie Chart Icon - Bottom Right -->
             <div class="floating-icon absolute bottom-[20%] right-[8%]" style="animation: floatPath6 13s ease-in-out infinite;">
                 <div class="w-10 h-10 bg-gradient-to-br from-pink-500/70 to-rose-500/70 rounded-lg flex items-center justify-center shadow-lg shadow-pink-500/30 backdrop-blur-sm">
