@@ -67,9 +67,7 @@ class ClientController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'type' => 'required|in:customer,lead,partner,prospect',
-            'status' => 'required|in:active,inactive',
             'tag' => 'required|in:Developer,Designer,Partner,Prospect',
-            'budget' => 'nullable|numeric',
         ]);
 
         Client::create([
@@ -77,9 +75,7 @@ class ClientController extends Controller
             'name' => $validated['name'],
             'email' => $validated['email'],
             'type' => $validated['type'],
-            'status' => $validated['status'],
-            'tags' => json_encode([$validated['tag']]),
-            'budget' => $validated['budget'] ?? 0,
+            'tags' => [$validated['tag']], // Model cast handles JSON encoding
         ]);
 
         return redirect()->route('clients.index')->with('success', 'Client created successfully.');
@@ -118,18 +114,14 @@ class ClientController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'type' => 'required|in:customer,lead,partner,prospect',
-            'status' => 'required|in:active,inactive',
             'tag' => 'required|in:Developer,Designer,Partner,Prospect',
-            'budget' => 'nullable|numeric',
         ]);
 
         $client->update([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'type' => $validated['type'],
-            'status' => $validated['status'],
-            'tags' => json_encode([$validated['tag']]),
-            'budget' => $validated['budget'] ?? 0,
+            'tags' => [$validated['tag']], // Model cast handles JSON encoding
         ]);
 
         return redirect()->route('clients.index')->with('success', 'Client updated successfully.');
