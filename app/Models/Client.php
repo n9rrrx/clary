@@ -13,7 +13,7 @@ class Client extends Model
 
     protected $fillable = [
         'team_id', 'name', 'email', 'phone',
-        'type', 'tags', 'address'
+        'type', 'status', 'tags', 'address', 'budget'
     ];
 
     protected $casts = [
