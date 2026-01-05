@@ -226,10 +226,29 @@
             </div>
         </div>
         <div class="ml-6 flex items-center space-x-4">
-            <button id="notificationsBtn" class="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-white transition-colors relative">
-                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white dark:ring-midnight-900"></span>
-            </button>
+            <!-- Notifications Dropdown -->
+            <div class="relative">
+                <button id="notificationsBtn" class="relative p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-white transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-midnight-700">
+                    <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                    <span id="notificationBadge" class="absolute top-0 right-0 min-w-[18px] h-[18px] rounded-full bg-red-500 ring-2 ring-white dark:ring-midnight-900 text-white text-[10px] font-semibold items-center justify-center" style="display: none;">0</span>
+                </button>
+                <div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-96 bg-white dark:bg-midnight-800 border border-gray-200 dark:border-line rounded-xl shadow-2xl z-50 overflow-hidden">
+                    <div class="px-4 py-3 border-b border-gray-200 dark:border-line flex items-center justify-between bg-gray-50 dark:bg-midnight-900/50">
+                        <h3 class="text-sm font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+                            <svg class="h-4 w-4 text-accent-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                            Notifications
+                        </h3>
+                        <button id="markAllReadBtn" class="text-xs text-accent-600 hover:text-accent-700 dark:text-accent-400 dark:hover:text-accent-300 font-medium hover:underline">Mark all read</button>
+                    </div>
+                    <div id="notificationsList" class="max-h-96 overflow-y-auto divide-y divide-gray-100 dark:divide-line/30">
+                        <div class="px-4 py-10 text-center text-gray-500 dark:text-gray-400 text-sm">
+                            <svg class="h-14 w-14 mx-auto mb-3 text-gray-200 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                            <p class="font-medium text-gray-600 dark:text-gray-300">No notifications yet</p>
+                            <p class="text-xs mt-1">You're all caught up!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <button id="themeToggle" class="flex items-center px-2 py-1 bg-gray-100 dark:bg-midnight-800 rounded text-gray-500 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors">
                 <svg id="themeIcon" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"></svg>
             </button>
@@ -301,6 +320,125 @@
         const menu = document.getElementById('userMenu');
         document.addEventListener('click', e => { if(!btn.contains(e.target) && !menu.contains(e.target)) menu.classList.add('hidden'); });
         btn.addEventListener('click', e => { e.preventDefault(); menu.classList.toggle('hidden'); });
+    })();
+
+    // Notifications System
+    (function() {
+        const notifBtn = document.getElementById('notificationsBtn');
+        const notifDropdown = document.getElementById('notificationsDropdown');
+        const notifBadge = document.getElementById('notificationBadge');
+        const notifList = document.getElementById('notificationsList');
+        const markAllBtn = document.getElementById('markAllReadBtn');
+
+        const iconMap = {
+            folder: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/></svg>',
+            clock: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            users: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>',
+            bell: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>',
+            invoice: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>',
+            check: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>',
+            warning: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>',
+            task: '<svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>',
+        };
+
+        function renderNotifications(notifications, unreadCount) {
+            if (unreadCount > 0) {
+                notifBadge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+                notifBadge.style.display = 'flex';
+            } else {
+                notifBadge.style.display = 'none';
+            }
+
+            if (notifications.length === 0) {
+                notifList.innerHTML = `
+                    <div class="px-4 py-10 text-center text-gray-500 dark:text-gray-400 text-sm">
+                        <svg class="h-14 w-14 mx-auto mb-3 text-gray-200 dark:text-gray-700" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
+                        <p class="font-medium text-gray-600 dark:text-gray-300">No notifications yet</p>
+                        <p class="text-xs mt-1">You're all caught up!</p>
+                    </div>`;
+                return;
+            }
+
+            notifList.innerHTML = notifications.map(n => `
+                <a href="${n.url || '#'}" data-id="${n.id}" class="notification-item block px-4 py-3 hover:bg-gray-50 dark:hover:bg-midnight-700/50 transition-colors ${n.read ? 'bg-white dark:bg-midnight-800' : 'bg-accent-50/50 dark:bg-accent-900/10'}">
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full ${n.read ? 'bg-gray-100 dark:bg-midnight-700 text-gray-400 dark:text-gray-500' : 'bg-accent-100 dark:bg-accent-900/40 text-accent-600 dark:text-accent-400'} flex items-center justify-center">
+                            ${iconMap[n.icon] || iconMap.bell}
+                        </div>
+                        <div class="flex-1 min-w-0 pr-2">
+                            <div class="flex items-center justify-between gap-2">
+                                <p class="text-sm font-semibold truncate ${n.read ? 'text-gray-600 dark:text-gray-400' : 'text-gray-900 dark:text-white'}">${n.title}</p>
+                                ${!n.read ? '<span class="flex-shrink-0 w-2 h-2 rounded-full bg-accent-500 animate-pulse"></span>' : ''}
+                            </div>
+                            <p class="text-xs text-gray-600 dark:text-gray-400 mt-0.5 line-clamp-2">${n.message}</p>
+                            <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-1.5 flex items-center gap-1">
+                                <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                ${n.created_at}
+                            </p>
+                        </div>
+                    </div>
+                </a>
+            `).join('');
+
+            // Add click handlers to mark as read
+            notifList.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    const id = this.dataset.id;
+                    fetch(`/notifications/${id}/read`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+                });
+            });
+        }
+
+        function fetchNotifications() {
+            fetch('/notifications', {
+                headers: { 'Accept': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                renderNotifications(data.notifications, data.unread_count);
+            })
+            .catch(err => console.error('Failed to fetch notifications:', err));
+        }
+
+        // Toggle dropdown
+        notifBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            notifDropdown.classList.toggle('hidden');
+            if (!notifDropdown.classList.contains('hidden')) {
+                fetchNotifications();
+            }
+        });
+
+        // Close on outside click
+        document.addEventListener('click', e => {
+            if (!notifBtn.contains(e.target) && !notifDropdown.contains(e.target)) {
+                notifDropdown.classList.add('hidden');
+            }
+        });
+
+        // Mark all as read
+        markAllBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            fetch('/notifications/read-all', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                }
+            })
+            .then(() => fetchNotifications());
+        });
+
+        // Initial load and periodic refresh
+        fetchNotifications();
+        setInterval(fetchNotifications, 60000); // Refresh every minute
     })();
 </script>
 @stack('scripts')

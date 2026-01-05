@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\Project;
 use App\Mail\TeamInvitation;
 use App\Services\PlanService;
+use App\Notifications\TeamInviteReceived;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
@@ -92,6 +93,9 @@ class TeamMemberController extends Controller
                 'role' => $request->role,
             ]);
 
+            // Send database notification
+            $existingUser->notify(new TeamInviteReceived($team, $currentUser->name));
+
             // Optionally assign to project if provided
             $assignedProject = null;
             if ($request->project_id) {
@@ -141,6 +145,9 @@ class TeamMemberController extends Controller
             'role' => $request->role,
             'budget_limit' => $request->budget_limit ?? 0,
         ]);
+
+        // Send database notification
+        $newUser->notify(new TeamInviteReceived($team, $currentUser->name));
 
         // Optionally assign to project if provided
         $assignedProject = null;

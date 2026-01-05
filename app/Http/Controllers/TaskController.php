@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Task;
 use App\Models\Project;
+use App\Models\User;
+use App\Notifications\TaskAssigned;
+use App\Notifications\TaskCompleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,10 +32,10 @@ class TaskController extends Controller
         }
 
         $tasks = $query->paginate(15);
-        
+
         // Get team members for assignment dropdown (owners only)
-        $teamMembers = $user->isOwnerOfCurrentTeam() && $team 
-            ? $team->members()->get() 
+        $teamMembers = $user->isOwnerOfCurrentTeam() && $team
+            ? $team->members()->get()
             : collect();
 
         return view('tasks.index', compact('tasks', 'teamMembers'));
@@ -47,13 +50,13 @@ class TaskController extends Controller
         $team = $user->currentTeam;
 
         // Get projects for this team
-        $projects = $team 
+        $projects = $team
             ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get()
             : collect();
 
         // Get team members for assignment (exclude owner - they don't work on tasks)
-        $teamMembers = $team 
-            ? $team->members()->where('user_id', '!=', $team->owner_id)->get() 
+        $teamMembers = $team
+            ? $team->members()->where('user_id', '!=', $team->owner_id)->get()
             : collect();
 
         return view('tasks.create', compact('projects', 'teamMembers'));
@@ -79,7 +82,15 @@ class TaskController extends Controller
 
         $validated['team_id'] = $team?->id;
 
-        Task::create($validated);
+        $task = Task::create($validated);
+
+        // Send notification if task is assigned to someone
+        if (!empty($validated['assigned_to_user_id'])) {
+            $assignedUser = User::find($validated['assigned_to_user_id']);
+            if ($assignedUser) {
+                $assignedUser->notify(new TaskAssigned($task, $user->name));
+            }
+        }
 
         return redirect()->route('tasks.index')
             ->with('success', 'Task created successfully.');
@@ -102,13 +113,13 @@ class TaskController extends Controller
         $user = Auth::user();
         $team = $user->currentTeam;
 
-        $projects = $team 
+        $projects = $team
             ? Project::where('team_id', $team->id)->where('status', '!=', 'cancelled')->get()
             : collect();
 
         // Get team members for assignment (exclude owner)
-        $teamMembers = $team 
-            ? $team->members()->where('user_id', '!=', $team->owner_id)->get() 
+        $teamMembers = $team
+            ? $team->members()->where('user_id', '!=', $team->owner_id)->get()
             : collect();
 
         return view('tasks.edit', compact('task', 'projects', 'teamMembers'));
@@ -119,6 +130,9 @@ class TaskController extends Controller
      */
     public function update(Request $request, Task $task)
     {
+        $previousAssignee = $task->assigned_to_user_id;
+        $previousStatus = $task->status;
+
         $validated = $request->validate([
             'project_id' => 'required|exists:projects,id',
             'title' => 'required|string|max:255',
@@ -131,7 +145,26 @@ class TaskController extends Controller
 
         $task->update($validated);
 
-        return redirect()->back()->with('success', 'Task updated successfully.');
+        // Send notification if task is assigned to a new user
+        if (!empty($validated['assigned_to_user_id']) && $validated['assigned_to_user_id'] != $previousAssignee) {
+            $assignedUser = User::find($validated['assigned_to_user_id']);
+            if ($assignedUser) {
+                $assignedUser->notify(new TaskAssigned($task, Auth::user()->name));
+            }
+        }
+
+        // Send notification to team owner when task is marked as completed
+        if ($validated['status'] === 'completed' && $previousStatus !== 'completed') {
+            $team = $task->team ?? Auth::user()->currentTeam;
+            if ($team && $team->owner_id !== Auth::id()) {
+                $owner = User::find($team->owner_id);
+                if ($owner) {
+                    $owner->notify(new TaskCompleted($task, Auth::user()->name));
+                }
+            }
+        }
+
+        return redirect()->route('tasks.index')->with('success', 'Task updated successfully.');
     }
 
     /**

@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\AgencyProfileController;
 use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Client\InvoiceController as ClientInvoiceController;
+use App\Http\Controllers\NotificationController;
 
 // Public Routes
 Route::get('/', function () {
@@ -49,7 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/team', [TeamMemberController::class, 'index'])->name('team.index');
     Route::post('/team/invite', [TeamMemberController::class, 'store'])->name('team.invite');
     Route::delete('/team/{user}', [TeamMemberController::class, 'destroy'])->name('team.remove');
-    
+
     // 4. PEOPLE MANAGEMENT (View all team members by tag)
     Route::get('/people', [PeopleController::class, 'index'])->name('people.index');
 
@@ -80,4 +81,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/invoices/{invoice}', [ClientInvoiceController::class, 'show'])->name('clients.invoices.show');
         Route::get('/projects/{project}', [ProjectController::class, 'clientShow'])->name('client.projects.show');
     });
+
+    // 9. NOTIFICATIONS
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
 });

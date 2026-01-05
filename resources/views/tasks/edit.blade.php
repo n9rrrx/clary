@@ -40,11 +40,9 @@
                         <label for="status" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                         <select name="status" id="status" required
                                 class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
-                            @foreach(['todo', 'in_progress', 'review', 'completed'] as $option)
-                                <option value="{{ $option }}" {{ old('status', $task->status) == $option ? 'selected' : '' }}>
-                                    {{ ucwords(str_replace('_', ' ', $option)) }}
-                                </option>
-                            @endforeach
+                            <option value="pending" {{ old('status', $task->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                            <option value="in_progress" {{ old('status', $task->status) == 'in_progress' ? 'selected' : '' }}>In Progress</option>
+                            <option value="completed" {{ old('status', $task->status) == 'completed' ? 'selected' : '' }}>Completed</option>
                         </select>
                         @error('status') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
@@ -53,11 +51,9 @@
                         <label for="priority" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Priority</label>
                         <select name="priority" id="priority" required
                                 class="w-full rounded-md border-gray-300 dark:border-gray-700 bg-white dark:bg-midnight-900 text-gray-900 dark:text-gray-100 focus:border-blue-500 focus:ring-blue-500 shadow-sm transition-colors">
-                            @foreach(['low', 'medium', 'high', 'urgent'] as $option)
-                                <option value="{{ $option }}" {{ old('priority', $task->priority) == $option ? 'selected' : '' }}>
-                                    {{ ucfirst($option) }}
-                                </option>
-                            @endforeach
+                            <option value="low" {{ old('priority', $task->priority) == 'low' ? 'selected' : '' }}>Low</option>
+                            <option value="medium" {{ old('priority', $task->priority) == 'medium' ? 'selected' : '' }}>Medium</option>
+                            <option value="high" {{ old('priority', $task->priority) == 'high' ? 'selected' : '' }}>High</option>
                         </select>
                         @error('priority') <span class="text-red-500 text-xs mt-1">{{ $message }}</span> @enderror
                     </div>
