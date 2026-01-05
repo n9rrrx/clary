@@ -8,10 +8,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Invoice extends Model
 {
     protected $fillable = [
+        'user_id',
         'team_id',
         'client_id',
         'project_id',
         'invoice_number',
+        'reference_number',
+        'amount',
         'issue_date',
         'due_date',
         'subtotal',
