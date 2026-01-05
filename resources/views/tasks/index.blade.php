@@ -49,9 +49,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priority</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Due Date</th>
-                        @if(Auth::user()->isOwnerOfCurrentTeam())
-                            <th class="relative px-6 py-3"><span class="sr-only">Edit</span></th>
-                        @endif
+                        <th class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
                     </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
@@ -80,21 +78,11 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="{{ route('tasks.show', $task->id) }}" class="text-sm font-bold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
-                                    {{ $task->title }}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <a href="{{ route('projects.show', $task->project->id) }}" class="text-sm text-blue-600 dark:text-blue-400 hover:underline">
-                                    {{ $task->project->name }}
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="px-2.5 py-0.5 rounded-full text-xs font-medium border
                                     {{ match($task->status) {
                                         'completed' => 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
                                         'in_progress' => 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
-                                        'review' => 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+                                        'pending' => 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800',
                                         default => 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
                                     } }}">
                                     {{ ucwords(str_replace('_', ' ', $task->status)) }}
@@ -114,15 +102,17 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                 {{ $task->due_date ? $task->due_date->format('M d') : '—' }}
                             </td>
-                            @if(Auth::user()->isOwnerOfCurrentTeam())
-                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">Edit</a>
-                                </td>
-                            @endif
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                @if(Auth::user()->isOwnerOfCurrentTeam() || $task->assigned_to_user_id === Auth::id())
+                                    <a href="{{ route('tasks.edit', $task->id) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors">
+                                        {{ Auth::user()->isOwnerOfCurrentTeam() ? 'Edit' : 'Update Status' }}
+                                    </a>
+                                @endif
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="{{ Auth::user()->isOwnerOfCurrentTeam() ? 6 : 5 }}" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                            <td colspan="7" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                 No tasks found.
                             </td>
                         </tr>

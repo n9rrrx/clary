@@ -7,6 +7,7 @@ use App\Models\Client;
 use App\Models\Activity;
 use App\Models\User;
 use App\Services\PlanService;
+use App\Notifications\ProjectAssigned;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -61,7 +62,7 @@ class ProjectController extends Controller
 
         // Only get clients for this team
         $clients = $team ? Client::where('team_id', $team->id)->get() : collect();
-        
+
         return view('projects.create', compact('clients'));
     }
 
@@ -104,14 +105,14 @@ class ProjectController extends Controller
     {
         $user = Auth::user();
         $team = $user->currentTeam;
-        
+
         $project->load(['client', 'tasks.assignedTo', 'invoices', 'members']);
-        
+
         // Get all team members for the assignment dropdown (owners/admins only)
-        $teamMembers = ($user->isOwnerOfCurrentTeam() && $team) 
+        $teamMembers = ($user->isOwnerOfCurrentTeam() && $team)
             ? $team->members()->get()
             : collect();
-        
+
         return view('projects.show', compact('project', 'teamMembers'));
     }
 
@@ -215,7 +216,7 @@ class ProjectController extends Controller
     public function assignMember(Request $request, Project $project)
     {
         $user = Auth::user();
-        
+
         // Only owners/admins can assign members
         if (!$user->isOwnerOfCurrentTeam()) {
             return redirect()->back()->with('error', 'Only team owners can assign project members.');
@@ -233,12 +234,15 @@ class ProjectController extends Controller
         // Check if user belongs to the same team
         $team = $user->currentTeam;
         $targetUser = User::findOrFail($validated['user_id']);
-        
+
         if (!$team->members()->where('user_id', $targetUser->id)->exists()) {
             return redirect()->back()->with('error', 'User must be a team member first.');
         }
 
         $project->members()->attach($validated['user_id']);
+
+        // Send notification to the assigned user
+        $targetUser->notify(new ProjectAssigned($project, $user->name));
 
         return redirect()->back()->with('success', 'Team member assigned to project successfully.');
     }
@@ -249,7 +253,7 @@ class ProjectController extends Controller
     public function removeMember(Project $project, User $user)
     {
         $currentUser = Auth::user();
-        
+
         // Only owners/admins can remove members
         if (!$currentUser->isOwnerOfCurrentTeam()) {
             return redirect()->back()->with('error', 'Only team owners can remove project members.');
