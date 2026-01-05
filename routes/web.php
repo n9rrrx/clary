@@ -22,6 +22,11 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Public Invoice View (signed URL - no login required)
+Route::get('/invoice/{invoice}/view', [InvoiceController::class, 'publicShow'])
+    ->name('invoice.public.show')
+    ->middleware('signed');
+
 // Plan-specific registration routes
 Route::get('/register/{plan?}', [SubscriptionController::class, 'showRegistration'])
     ->name('register.plan')
@@ -43,6 +48,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/projects/{project}/members/{user}', [ProjectController::class, 'removeMember'])->name('projects.members.remove');
     Route::resource('tasks', TaskController::class);
     Route::resource('invoices', InvoiceController::class);
+    Route::post('/invoices/{invoice}/send', [InvoiceController::class, 'sendEmail'])->name('invoices.send');
+    Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'downloadPdf'])->name('invoices.pdf');
 
     Route::post('/dashboard/activity', [DashboardController::class, 'storeActivity'])->name('dashboard.activity.store');
 

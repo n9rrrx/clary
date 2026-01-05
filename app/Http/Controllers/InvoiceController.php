@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Invoice;
 use App\Models\Client;
 use App\Models\Project;
+use App\Mail\InvoiceMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class InvoiceController extends Controller
 {
@@ -68,13 +71,29 @@ class InvoiceController extends Controller
         ]);
 
         $invoice = new Invoice($validated);
+        $invoice->user_id = $user->id;
         $invoice->team_id = $team?->id;
+        $invoice->reference_number = $validated['invoice_number']; // Required field from original migration
+        $invoice->amount = $validated['subtotal']; // Required field from original migration
         $invoice->tax = $request->tax ?? 0;
         $invoice->total = $invoice->subtotal + $invoice->tax;
 
         $invoice->save();
 
-        return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
+        // Send email to client if status is 'sent'
+        if ($invoice->status === 'sent') {
+            $invoice->load('client');
+            if ($invoice->client && $invoice->client->email) {
+                try {
+                    Mail::to($invoice->client->email)->send(new InvoiceMail($invoice, $user));
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send invoice email: ' . $e->getMessage());
+                    return redirect()->route('invoices.index')->with('warning', 'Invoice created but email failed to send.');
+                }
+            }
+        }
+
+        return redirect()->route('invoices.index')->with('success', 'Invoice created and sent to client successfully.');
     }
 
     public function show($id)
@@ -145,6 +164,8 @@ class InvoiceController extends Controller
         ]);
 
         $invoice->fill($validated);
+        $invoice->reference_number = $validated['invoice_number']; // Keep in sync
+        $invoice->amount = $validated['subtotal']; // Keep in sync
         $invoice->tax = $request->tax ?? 0;
         $invoice->total = $invoice->subtotal + $invoice->tax;
         $invoice->save();
@@ -170,5 +191,101 @@ class InvoiceController extends Controller
         $invoice->delete();
 
         return redirect()->route('invoices.index')->with('success', 'Invoice deleted successfully.');
+    }
+
+    /**
+     * Public invoice view (no login required, uses signed URL)
+     */
+    public function publicShow(Invoice $invoice)
+    {
+        $invoice->load(['client', 'project']);
+
+        return view('invoices.public', compact('invoice'));
+    }
+
+    /**
+     * Generate PDF for an invoice
+     */
+    public function generatePdf(Invoice $invoice)
+    {
+        $invoice->load(['client', 'project']);
+        $sender = Auth::user();
+
+        $pdf = Pdf::loadView('invoices.pdf', [
+            'invoice' => $invoice,
+            'sender' => $sender,
+        ]);
+
+        return $pdf;
+    }
+
+    /**
+     * Download invoice as PDF
+     */
+    public function downloadPdf(Invoice $invoice)
+    {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        // Verify invoice belongs to this team
+        if ($team && $invoice->team_id !== $team->id) {
+            abort(404);
+        }
+
+        $pdf = $this->generatePdf($invoice);
+
+        return $pdf->download("invoice-{$invoice->invoice_number}.pdf");
+    }
+
+    /**
+     * Send/Resend invoice email to client
+     */
+    public function sendEmail(Invoice $invoice)
+    {
+        $user = Auth::user();
+        $team = $user->currentTeam;
+
+        if (!$user->isOwnerOfCurrentTeam()) {
+            abort(403);
+        }
+
+        // Verify invoice belongs to this team
+        if ($team && $invoice->team_id !== $team->id) {
+            abort(404);
+        }
+
+        $invoice->load(['client', 'project']);
+
+        if (!$invoice->client || !$invoice->client->email) {
+            return redirect()->back()->with('error', 'Client email is missing.');
+        }
+
+        try {
+            // Generate PDF
+            $pdf = Pdf::loadView('invoices.pdf', [
+                'invoice' => $invoice,
+                'sender' => $user,
+            ]);
+
+            // Send email with PDF attachment
+            Mail::to($invoice->client->email)->send(
+                (new InvoiceMail($invoice, $user))->attachData(
+                    $pdf->output(),
+                    "invoice-{$invoice->invoice_number}.pdf",
+                    ['mime' => 'application/pdf']
+                )
+            );
+
+            // Update status to sent if it was draft
+            if ($invoice->status === 'draft') {
+                $invoice->status = 'sent';
+                $invoice->save();
+            }
+
+            return redirect()->back()->with('success', 'Invoice sent to ' . $invoice->client->email . ' with PDF attachment.');
+        } catch (\Exception $e) {
+            \Log::error('Failed to send invoice email: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Failed to send email: ' . $e->getMessage());
+        }
     }
 }

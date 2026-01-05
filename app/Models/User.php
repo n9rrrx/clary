@@ -84,6 +84,15 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
+    /**
+     * Get the client profile linked to this user (by email match)
+     * This is used for the client portal
+     */
+    public function client()
+    {
+        return $this->hasOne(Client::class, 'email', 'email');
+    }
+
     // --- PLAN HELPER METHODS ---
 
     /**
