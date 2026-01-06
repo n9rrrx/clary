@@ -50,10 +50,12 @@
                 <td>
                     <table cellpadding="0" cellspacing="0">
                         <tr>
+                            <td style="vertical-align: middle; padding-right: 10px;">
+                                <img src="{{ public_path('logos/logo-clary-spider.png') }}" alt="Clary" width="36" height="36">
+                            </td>
                             <td style="vertical-align: middle;">
                                 <span class="logo-text">Clary</span>
                             </td>
-
                         </tr>
                     </table>
                 </td>

@@ -4,11 +4,11 @@ namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Invoice;
 use App\Models\User;
+use Illuminate\Mail\Mailables\Envelope;
+use Symfony\Component\Mime\Email;
 
 class InvoiceMail extends Mailable
 {
@@ -37,17 +37,28 @@ class InvoiceMail extends Mailable
     }
 
     /**
-     * Get the message content definition.
+     * Build the message.
      */
-    public function content(): Content
+    public function build()
     {
-        return new Content(
-            markdown: 'emails.invoice',
-            with: [
+        $logoPath = public_path('logos/logo-clary-spider.png');
+        $logoCid = 'logo-clary';
+
+        $mailable = $this->markdown('emails.invoice')
+            ->with([
                 'invoice' => $this->invoice,
                 'sender' => $this->sender,
-            ],
-        );
+                'logoCid' => 'cid:' . $logoCid,
+            ]);
+
+        // Embed the logo using Symfony's method
+        if (file_exists($logoPath)) {
+            $mailable->withSymfonyMessage(function (Email $message) use ($logoPath, $logoCid) {
+                $message->embedFromPath($logoPath, $logoCid, 'image/png');
+            });
+        }
+
+        return $mailable;
     }
 
     /**

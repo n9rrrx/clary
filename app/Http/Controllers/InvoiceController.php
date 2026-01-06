@@ -82,18 +82,33 @@ class InvoiceController extends Controller
 
         // Send email to client if status is 'sent'
         if ($invoice->status === 'sent') {
-            $invoice->load('client');
+            $invoice->load(['client', 'project']);
             if ($invoice->client && $invoice->client->email) {
                 try {
-                    Mail::to($invoice->client->email)->send(new InvoiceMail($invoice, $user));
+                    // Generate PDF
+                    $pdf = Pdf::loadView('invoices.pdf', [
+                        'invoice' => $invoice,
+                        'sender' => $user,
+                    ]);
+
+                    // Send email with PDF attachment
+                    Mail::to($invoice->client->email)->send(
+                        (new InvoiceMail($invoice, $user))->attachData(
+                            $pdf->output(),
+                            "invoice-{$invoice->invoice_number}.pdf",
+                            ['mime' => 'application/pdf']
+                        )
+                    );
+
+                    return redirect()->route('invoices.index')->with('success', 'Invoice created and sent to ' . $invoice->client->email . ' with PDF attachment.');
                 } catch (\Exception $e) {
                     \Log::error('Failed to send invoice email: ' . $e->getMessage());
-                    return redirect()->route('invoices.index')->with('warning', 'Invoice created but email failed to send.');
+                    return redirect()->route('invoices.index')->with('warning', 'Invoice created but email failed to send: ' . $e->getMessage());
                 }
             }
         }
 
-        return redirect()->route('invoices.index')->with('success', 'Invoice created and sent to client successfully.');
+        return redirect()->route('invoices.index')->with('success', 'Invoice created successfully.');
     }
 
     public function show($id)
