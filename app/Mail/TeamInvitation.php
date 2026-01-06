@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use Symfony\Component\Mime\Email;
 
 class TeamInvitation extends Mailable
 {
@@ -18,6 +19,7 @@ class TeamInvitation extends Mailable
     public $assignedRole;
     public $assignedProject;
     public $sender;
+    public $logoCid;
 
     /**
      * Build the invitation with Role and Budget details
@@ -31,12 +33,26 @@ class TeamInvitation extends Mailable
         $this->assignedRole = $assignedRole;
         $this->assignedProject = $assignedProject;
         $this->sender = $sender;
+        $this->logoCid = 'cid:logo-clary';
     }
 
     public function build()
     {
+        $logoPath = public_path('logos/logo-clary-spider.png');
+        $logoCid = 'logo-clary';
+
         $mail = $this->subject("Assignment Details: You've been added to {$this->clientName}")
-            ->view('emails.team-invitation');
+            ->view('emails.team-invitation')
+            ->with([
+                'logoCid' => 'cid:' . $logoCid,
+            ]);
+
+        // Embed the logo using Symfony's method
+        if (file_exists($logoPath)) {
+            $mail->withSymfonyMessage(function (Email $message) use ($logoPath, $logoCid) {
+                $message->embedFromPath($logoPath, $logoCid, 'image/png');
+            });
+        }
 
         // Use consistent "Clary" branding for all emails
         // The actual sender's info is shown in the email body
