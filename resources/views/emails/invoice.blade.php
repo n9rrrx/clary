@@ -1,4 +1,4 @@
-<x-mail::message>
+<x-mail::message :logoCid="$logoCid ?? ''">
 # You've received an invoice
 
 Hi {{ $invoice->client->name }},
