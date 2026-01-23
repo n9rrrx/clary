@@ -438,9 +438,7 @@
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-gradient-to-br from-[#0066FF] to-[#6B4CE6] rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/30">
-                    <span class="text-white font-bold text-xl">C</span>
-                </div>
+                <img src="/logos/logo-clary-spider.svg" alt="Clary Logo" class="w-10 h-10">
                 <span class="text-2xl font-bold text-gray-900 dark:text-white" style="font-family: 'Bricolage Grotesque', sans-serif;">Clary</span>
             </div>
 
@@ -1424,9 +1422,7 @@
         <div class="grid md:grid-cols-5 gap-12 mb-12">
             <div class="md:col-span-2">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-10 h-10 bg-gradient-to-br from-[#0066FF] to-[#6B4CE6] rounded-xl flex items-center justify-center">
-                        <span class="text-white font-bold text-xl">C</span>
-                    </div>
+                    <img src="/logos/logo-clary-spider.svg" alt="Clary Logo" class="w-10 h-10">
                     <span class="text-2xl font-bold" style="font-family: 'Bricolage Grotesque', sans-serif;">Clary</span>
                 </div>
                 <p class="text-gray-600 dark:text-gray-400 max-w-sm mb-6">
