@@ -6,11 +6,11 @@ Clary is a comprehensive project management platform designed for high-performin
 
 ```mermaid
 graph TD
-    User[(Member/Admin)] -->|Role-Based Access| ClaryEngine[Clary Engine]
-    ClaryEngine -->|Client Management| CRMModule[CRM Module]
-    ClaryEngine -->|Task Tracking| KanbanBoard[Kanban Board]
-    ClaryEngine -->|Financials| InvoicingSystem[Invoicing System]
-    InvoicingSystem -->|PDF Generator| DomPDF[(DomPDF Engine)]
+    User["Member/Admin"] -->|Role-Based Access| ClaryEngine["Clary Engine"]
+    ClaryEngine -->|Client Management| CRMModule["CRM Module"]
+    ClaryEngine -->|Task Tracking| KanbanBoard["Kanban Board"]
+    ClaryEngine -->|Financials| InvoicingSystem["Invoicing System"]
+    InvoicingSystem -->|PDF Generator| DomPDF[("DomPDF Engine")]
 ```
 
 ## 🚀 Key Features
