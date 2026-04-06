@@ -6,7 +6,7 @@ Clary is a comprehensive project management platform designed for high-performin
 
 | Main Dashboard | Automated Invoicing |
 | :---: | :---: |
-| ![Main Dashboard](./screenshots/logo-clary-spider.png) | ![Automated Invoicing](./screenshots/logo-clary-128.svg) |
+| ![Main Dashboard](./screenshots/dashboard.png) | ![Automated Invoicing](./screenshots/invoicing.png) |
 
 ## 🏛 Architecture Overview
 
